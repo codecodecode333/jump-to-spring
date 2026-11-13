@@ -764,3 +764,17 @@
 - 결과
   - 컨트롤러 테스트 재실행: AnswerControllerTest 9개, QuestionControllerTest 19개 모두 통과
   - `hyperframes check` 통과, 스냅샷 확인
+
+### [046] feat(video): 테스트 장 (음성 70초, 샘플 데이터 의존 → 자기 데이터 → 57개 구성 → 전체 실행 결과)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/046)
+- 출처: 대본 [039] `06-test.txt`, README [006]·[007]·[029], 강의 저장소(jhs512/p-14163-2) `QuestionRepositoryTest`·`TestInitData`
+- 작업
+  - 테스트 장 내레이션 생성 (13문장, 70초 + 결과 화면 여유 8초)
+  - `compositions/06-test.html`: ① 강의 테스트(`@SpringBootTest`, `findById(1)`)와 `@Profile` 없는 `TestInitData` → ② "1번 질문이 있다고 가정" → ③ `@BeforeEach`로 자기 데이터, `BaseInitData`는 `@Profile("dev")` → 57개 클래스별 막대 → 테스트 종류(`@DataJpaTest` / `@SpringBootTest`+`MockMvcTester` / 순수 자바)와 `@WithMockUser`·`@WithAnonymousUser` → ④ 전체 실행 결과
+  - 증거 만들기: `./gradlew test --rerun`으로 전체 테스트 실제 실행, 클래스별 개수 집계
+- 이유
+  - 강의 테스트의 문제를 말로만 하지 않고 강의 저장소 원문(`findById(1)`, `@Profile` 없는 초기 데이터)으로 보여 줌
+  - 57개 구성과 실행 시간은 이번 실행의 테스트 리포트에서 집계한 값
+- 결과
+  - 전체 테스트 57 tests, 0 failures, 테스트 실행 21.0초 (영상용 재실행)
+  - `hyperframes check` 통과, 스냅샷 확인

@@ -1,22 +1,165 @@
 <!doctype html>
 <html lang="ko">
   <body>
-    <!-- 05 · 테스트: 장면은 이 div 안에 작성. id 는 다른 장과 겹치지 않게 ch06- 로 시작 -->
+    <!-- 05 테스트: 제목 → ① 강의 테스트(샘플 데이터 의존) ② 문제점 → ③ 자기 데이터 + dev 전용 샘플 → 57개 구성 → 테스트 종류·로그인 → ④ 전체 실행 결과 -->
     <div id="ch06" class="chapter" data-composition-id="ch06" data-width="1920" data-height="1080">
-      <div class="stage center">
-        <div id="ch06-kicker" class="kicker">05 · 테스트</div>
-        <div id="ch06-hero" class="hero">57개의 테스트로 증명하기</div>
+      <style>
+        #ch06 .layer { position: absolute; inset: 0; padding: 70px 140px 190px; display: flex; flex-direction: column; justify-content: center; opacity: 0; }
+        #ch06 .layer.first { opacity: 1; }
+        #ch06 .steps { display: flex; gap: 14px; margin-bottom: 12px; }
+        #ch06 .steps .step { margin-bottom: 0; }
+        #ch06 .title { font-size: 60px; margin-bottom: 26px; }
+        #ch06 .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px; }
+        #ch06 .label { font-size: 28px; color: var(--muted); margin: 0 0 8px 4px; font-weight: 700; }
+        #ch06 .codebox { font-size: 28px; padding: 22px 28px; }
+        #ch06 .warnline { margin-top: 22px; font-size: 32px; font-weight: 700; color: var(--warn); opacity: 0; }
+
+        #ch06 .bars { display: flex; flex-direction: column; gap: 10px; }
+        #ch06 .bar-row { display: grid; grid-template-columns: 480px minmax(0, 1fr) 70px; gap: 20px; align-items: center; font-size: 30px; }
+        #ch06 .bar-row .name { font-family: var(--font-code); color: var(--muted); font-size: 28px; }
+        #ch06 .bar { height: 30px; border-radius: 8px; background: var(--spring); transform-origin: left center; }
+        #ch06 .bar-row .n { font-weight: 800; text-align: right; }
+        #ch06 .total { font-size: 44px; font-weight: 800; margin-bottom: 18px; }
+        #ch06 .total b { color: var(--spring); }
+
+        #ch06 .kinds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+        #ch06 .kind .codebox { font-size: 28px; margin-top: 10px; }
+        #ch06 .kind h3 { font-size: 36px; }
+        #ch06 .login { margin-top: 26px; }
+        #ch06 .term { font-size: 30px; line-height: 1.6; }
+        #ch06 .term .big { font-size: 40px; font-weight: 800; }
+      </style>
+
+      <!-- 0) 제목 -->
+      <div id="ch06-l0" class="layer first center" data-hold>
+        <div class="kicker">05 · 테스트</div>
+        <div class="hero">57개의 테스트로<br /><em>증명하기</em></div>
       </div>
+
+      <!-- 1) ① 강의 테스트 원문 (jhs512/p-14163-2) / ② 문제점 -->
+      <div id="ch06-l1" class="layer" data-hold>
+        <div class="steps"><span class="step book">① 교재·강의 방식</span><span id="ch06-p" class="step problem" style="opacity:0">② 문제점</span></div>
+        <div class="title">샘플 데이터에 기댄 테스트</div>
+        <div class="two">
+          <div><div class="label">QuestionRepositoryTest (강의 14163)</div><div class="codebox">@SpringBootTest
+class QuestionRepositoryTest {
+  void t2() {
+    Question question =
+      questionRepository.<span class="bad">findById(1)</span>.get();</div></div>
+          <div><div class="label">TestInitData (강의 14163)</div><div class="codebox">@Configuration   <span class="c">// @Profile 없음</span>
+public class TestInitData {
+  void work1() {
+    q1.setSubject("sbb가 무엇인가요?");
+    <span class="c">// → 테스트에서도 실행됨</span></div></div>
+        </div>
+        <div id="ch06-warn" class="warnline">"1번 질문이 있다"고 가정 → 샘플 데이터를 바꾸면 테스트가 깨진다</div>
+      </div>
+
+      <!-- 2) ③ 개선: 테스트가 자기 데이터를 만든다, 샘플은 dev 전용 -->
+      <div id="ch06-l2" class="layer" data-hold>
+        <div class="steps"><span class="step fix">③ 개선 코드</span></div>
+        <div class="title">테스트는 자기 데이터로</div>
+        <div class="two">
+          <div><div class="label">QuestionRepositoryTest</div><div class="codebox"><span class="hl">@BeforeEach</span>
+void setUp() {
+  q1 = questionRepository.save(
+    new Question("sbb가 무엇인가요?", …));
+}
+<span class="c">// 테스트가 끝나면 롤백</span></div></div>
+          <div id="ch06-dev"><div class="label">BaseInitData</div><div class="codebox"><span class="hl">@Profile("dev")</span>   <span class="c">// 개발 서버에서만</span>
+@Configuration
+public class BaseInitData {
+  …
+}</div></div>
+        </div>
+      </div>
+
+      <!-- 3) 57개 구성 (이번 전체 실행 결과의 클래스별 개수) -->
+      <div id="ch06-l3" class="layer" data-hold>
+        <div class="total">테스트 <b>57</b>개</div>
+        <div class="bars">
+          <div class="bar-row"><span class="name">QuestionControllerTest</span><div class="bar" style="width: 100%"></div><span class="n">19</span></div>
+          <div class="bar-row"><span class="name">QuestionRepositoryTest</span><div class="bar" style="width: 57.9%"></div><span class="n">11</span></div>
+          <div class="bar-row"><span class="name">AnswerControllerTest</span><div class="bar" style="width: 47.4%"></div><span class="n">9</span></div>
+          <div class="bar-row"><span class="name">UserLoginTest</span><div class="bar" style="width: 26.3%"></div><span class="n">5</span></div>
+          <div class="bar-row"><span class="name">UserControllerTest</span><div class="bar" style="width: 21.1%"></div><span class="n">4</span></div>
+          <div class="bar-row"><span class="name">MarkdownServiceTest</span><div class="bar" style="width: 15.8%"></div><span class="n">3</span></div>
+          <div class="bar-row"><span class="name">MainControllerTest</span><div class="bar" style="width: 10.5%"></div><span class="n">2</span></div>
+          <div class="bar-row"><span class="name">UserServiceTest</span><div class="bar" style="width: 10.5%"></div><span class="n">2</span></div>
+          <div class="bar-row"><span class="name">QuestionListQueryCountTest</span><div class="bar" style="width: 5.3%"></div><span class="n">1</span></div>
+          <div class="bar-row"><span class="name">SbbApplicationTests</span><div class="bar" style="width: 5.3%"></div><span class="n">1</span></div>
+        </div>
+      </div>
+
+      <!-- 4) 목적에 맞는 테스트 종류 + 로그인 상태 만들기 -->
+      <div id="ch06-l4" class="layer" data-hold>
+        <div class="title">목적에 맞는 테스트</div>
+        <div class="kinds">
+          <div class="card kind"><h3>리포지터리</h3><div class="codebox"><span class="hl">@DataJpaTest</span>
+<span class="c">// JPA 부분만</span></div></div>
+          <div class="card kind"><h3>컨트롤러</h3><div class="codebox"><span class="hl">@SpringBootTest</span>
+<span class="hl">MockMvcTester</span>
+<span class="c">// 요청 → 화면</span></div></div>
+          <div class="card kind"><h3>마크다운</h3><div class="codebox">new <span class="hl">MarkdownService()</span>
+<span class="c">// 스프링 없이</span></div></div>
+        </div>
+        <div class="two login">
+          <div class="codebox"><span class="hl">@WithMockUser</span>(username = "user1")
+<span class="c">// 로그인한 상태로 요청</span></div>
+          <div class="codebox"><span class="hl">@WithAnonymousUser</span>
+<span class="c">// → 로그인 페이지로 가는지 확인</span></div>
+        </div>
+      </div>
+
+      <!-- 5) ④ 결과: 전체 테스트 실제 실행 -->
+      <div id="ch06-l5" class="layer" data-hold>
+        <div class="steps"><span class="step proof">④ 결과 증명</span></div>
+        <div class="term">$ ./gradlew test
+
+<span class="ok">BUILD SUCCESSFUL</span>
+
+<span class="big"><span class="ok">57</span> tests · <span class="ok">0</span> failures</span>   <span class="c">(테스트 실행 21.0초)</span></div>
+      </div>
+
       <script>
         (() => {
-          // build.py 가 내레이션 길이에 맞춰 채운다: CUES[i] = i번째 문장이 시작되는 시간(장 기준 초)
-          const CUES = /*CUES*/[]/*END*/;
-          const DUR = /*DUR*/4.0/*END*/;
+          const CUES = /*CUES*/[0.0, 4.118, 9.436, 15.09, 20.888, 27.31, 31.956, 35.714, 41.104, 48.27, 53.66, 60.01, 65.256]/*END*/;
+          const DUR = /*DUR*/77.984/*END*/;
           const at = (i, offset = 0) => (CUES[i] ?? 0) + offset;
-
+          const ease = "power3.out";
           const tl = gsap.timeline({ paused: true });
-          tl.from("#ch06-kicker", { opacity: 0, y: 30, duration: 0.5, ease: "power3.out" }, at(0, 0.1));
-          tl.from("#ch06-hero", { opacity: 0, y: 40, duration: 0.6, ease: "power3.out" }, at(0, 0.3));
+          const swap = (from, to, t) => {
+            tl.to(`#ch06-l${from}`, { opacity: 0, duration: 0.35 }, t - 0.1);
+            tl.to(`#ch06-l${to}`, { opacity: 1, duration: 0.35 }, t + 0.15);
+          };
+
+          tl.from("#ch06-l0 .hero", { opacity: 0, y: 40, duration: 0.6, ease }, 0.2);
+
+          // ① / ②
+          swap(0, 1, at(1));
+          tl.from("#ch06-l1 .two > *", { opacity: 0, y: 24, duration: 0.45, ease, stagger: 1.4 }, at(2));
+          tl.to("#ch06-p", { opacity: 1, duration: 0.3 }, at(3));
+          tl.to("#ch06-warn", { opacity: 1, duration: 0.4 }, at(3, 0.2));
+
+          // ③
+          swap(1, 2, at(4));
+          tl.from("#ch06-dev", { opacity: 0, y: 24, duration: 0.45, ease }, at(5));
+
+          // 57개 구성: 막대가 차례로 자란다
+          swap(2, 3, at(6));
+          tl.from("#ch06-l3 .bar", { scaleX: 0, duration: 0.5, ease: "power2.out", stagger: 0.18 }, at(6, 0.4));
+
+          // 테스트 종류
+          swap(3, 4, at(7));
+          tl.from("#ch06-l4 .kind:nth-child(1)", { opacity: 0, y: 24, duration: 0.45, ease }, at(7, 0.3));
+          tl.from("#ch06-l4 .kind:nth-child(2)", { opacity: 0, y: 24, duration: 0.45, ease }, at(8));
+          tl.from("#ch06-l4 .kind:nth-child(3)", { opacity: 0, y: 24, duration: 0.45, ease }, at(9));
+          tl.from("#ch06-l4 .login > *", { opacity: 0, y: 24, duration: 0.45, ease, stagger: 2.5 }, at(10));
+
+          // ④
+          swap(4, 5, at(12));
+          tl.from("#ch06-l5 .term", { opacity: 0, y: 30, duration: 0.5, ease }, at(12, 0.3));
+
           window.__timelines = window.__timelines || {};
           window.__timelines["ch06"] = tl;
         })();
