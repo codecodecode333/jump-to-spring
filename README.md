@@ -794,3 +794,16 @@
 - 결과
   - 브라우저: 회원가입 오류(비밀번호 불일치·아이디 중복·이메일 중복) 후 포커스가 `password2`(첫 오류)로, 질문 등록(내용 누락) 후 `content`로 이동, 입력한 제목은 유지 (수정 전에는 `BODY`)
   - `./gradlew test` 57건 통과
+
+### [048] feat(video): 폼과 사용성 장 (음성 58초, record 폼·오류 정렬·첫 오류 포커스·중복 항목별·페이지 1부터·검색어 URL)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/048)
+- 출처: 대본 [039] `07-form.txt`, README [019]·[022]·[027]·[036]·[047], 교재 저장소 `UserCreateForm`·`UserController`·`question_list.html`
+- 작업
+  - 폼 장 내레이션 생성 (9문장, 58초 + 결과 화면 여유 8초)
+  - `compositions/07-form.html`: 교재 `@Getter @Setter` 폼 클래스 → record → 오류 메시지 규칙과 정렬·`DOMContentLoaded` 포커스 → 같은 실제 화면에서 첫 오류 칸(비밀번호 확인)과 오류 목록에 강조 테두리 → 교재 `reject("signupFailed", …)` vs `rejectValue("username"/"email")` → 페이지 번호(교재 `sequence(0, …)` vs `Math.max(page, 1) - 1`) → 검색(교재 숨은 `searchForm` + JS vs GET 폼과 `kw` 파라미터, 실제 검색 화면)
+  - 증거 만들기: 개발 서버에 이미 있는 아이디·이메일 + 비밀번호 불일치로 실제 가입 요청 → 응답 HTML 캡처(`form-signup-errors.png`, [047] 수정 후 다시 캡처해 비밀번호 확인 칸에 포커스), 검색 결과 화면 캡처(`form-search.png`)
+- 이유
+  - "첫 오류 칸에 커서가 간다"는 장면을 만들기 전에 실제로 확인하다가 동작하지 않는 것을 발견 → [047]에서 앱을 고친 뒤, 고친 화면으로 촬영
+  - [047] 커밋에 이 장의 스크린샷 두 장이 함께 들어갔음 (`git add -A`). 그중 회원가입 화면은 수정 전 상태(사용자ID 칸 포커스)라 이번 커밋에서 수정 후 화면으로 교체
+- 결과
+  - `hyperframes check` 통과, 스냅샷으로 강조 테두리 위치·코드 박스 넘침·제목 교체를 확인하고 수정

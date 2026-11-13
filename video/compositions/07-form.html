@@ -1,22 +1,161 @@
 <!doctype html>
 <html lang="ko">
   <body>
-    <!-- 06 · 폼과 사용성: 장면은 이 div 안에 작성. id 는 다른 장과 겹치지 않게 ch07- 로 시작 -->
+    <!-- 06 폼과 사용성: 제목 → record 폼 → 오류 정렬·첫 오류 포커스 → 중복 항목별 안내 → 페이지 1부터 → 검색어 URL 유지 -->
     <div id="ch07" class="chapter" data-composition-id="ch07" data-width="1920" data-height="1080">
-      <div class="stage center">
-        <div id="ch07-kicker" class="kicker">06 · 폼과 사용성</div>
-        <div id="ch07-hero" class="hero">사용자가 바로 고칠 수 있게</div>
+      <style>
+        #ch07 .layer { position: absolute; inset: 0; padding: 70px 120px 190px; display: flex; flex-direction: column; justify-content: center; opacity: 0; }
+        #ch07 .layer.first { opacity: 1; }
+        #ch07 .title { font-size: 56px; margin-bottom: 24px; }
+        #ch07 .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px; }
+        #ch07 .split { display: grid; grid-template-columns: minmax(0, 1fr) 780px; gap: 34px; align-items: center; }
+        #ch07 .label { font-size: 28px; color: var(--muted); margin: 0 0 8px 4px; font-weight: 700; }
+        #ch07 .codebox { font-size: 28px; padding: 20px 26px; }
+        #ch07 .stack { display: flex; flex-direction: column; gap: 18px; }
+        #ch07 .window { width: 780px; background: #fff; border-radius: 14px; overflow: hidden; border: 1px solid #475569;
+          box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5); position: relative; }
+        #ch07 .window .bar { height: 44px; background: #e2e8f0; display: flex; align-items: center; gap: 10px; padding: 0 16px; }
+        #ch07 .window .dot { width: 13px; height: 13px; border-radius: 50%; background: #94a3b8; }
+        #ch07 .window .url { margin-left: 12px; font-family: var(--font-code); font-size: 22px; color: #334155; }
+        #ch07 .window img { display: block; width: 100%; }
+        #ch07 .ring { position: absolute; border: 5px solid var(--spring); border-radius: 12px; opacity: 0; }
+        #ch07 .sub-pane { position: relative; }
+        #ch07 .swap { position: absolute; inset: 0; opacity: 0; }
+        #ch07 .swap.first { position: relative; opacity: 1; }
+      </style>
+
+      <!-- 0) 제목 -->
+      <div id="ch07-l0" class="layer first center" data-hold>
+        <div class="kicker">06 · 폼과 사용성</div>
+        <div class="hero">사용자가<br /><em>바로 고칠 수 있게</em></div>
       </div>
+
+      <!-- 1) 폼 객체: 교재 클래스 vs record -->
+      <div id="ch07-l1" class="layer" data-hold>
+        <div class="title">폼 객체는 record로</div>
+        <div class="two">
+          <div><div class="label">UserCreateForm.java (교재)</div><div class="codebox"><span class="bad">@Getter @Setter</span>
+public class UserCreateForm {
+  @Size(min = 3, max = 25)
+  @NotEmpty(message = "사용자ID는 필수항목입니다.")
+  private String username;
+  …</div></div>
+          <div><div class="label">UserController.SignupForm (개선)</div><div class="codebox">public <span class="hl">record</span> SignupForm(
+  @NotBlank(message = "<span class="hl">01-username-</span>사용자ID는 …")
+  @Size(min = 3, max = 25, …)
+  String username,
+  String password1,
+  String password2,
+  String email
+) {}</div></div>
+        </div>
+      </div>
+
+      <!-- 2) 오류 정렬 + 첫 오류 포커스 / 3) 중복 항목별 (같은 실제 화면, 강조만 바뀜) -->
+      <div id="ch07-l2" class="layer" data-hold>
+        <div class="sub-pane"><div class="title swap first" id="ch07-t-a">오류는 번호순, 커서는 첫 오류 칸으로</div><div class="title swap" id="ch07-t-b">중복은 항목별로</div></div>
+        <div class="split">
+          <div class="sub-pane">
+            <div id="ch07-2a" class="swap first stack">
+              <div><div class="label">메시지 규칙: 번호-필드명-내용</div><div class="codebox"><span class="hl">05-password2-</span>2개의 비밀번호가 일치하지 않습니다.
+<span class="hl">08-username-</span>이미 사용 중인 사용자ID입니다.
+<span class="hl">09-email-</span>이미 사용 중인 이메일입니다.</div></div>
+              <div><div class="label">form_errors.html</div><div class="codebox">#fields.allErrors().stream().<span class="hl">sorted()</span>
+…
+document.addEventListener(<span class="s">'DOMContentLoaded'</span>, …
+  form.elements[fieldName].<span class="hl">focus()</span>)</div></div>
+            </div>
+            <div id="ch07-2b" class="swap stack">
+              <div><div class="label">UserController (교재)</div><div class="codebox">catch (DataIntegrityViolationException e) {
+  bindingResult.<span class="bad">reject</span>("signupFailed",
+    <span class="bad">"이미 등록된 사용자입니다."</span>);</div></div>
+              <div><div class="label">UserController (개선)</div><div class="codebox">if (userService.existsByUsername(…))
+  bindingResult.<span class="hl">rejectValue("username"</span>, …);
+if (userService.existsByEmail(…))
+  bindingResult.<span class="hl">rejectValue("email"</span>, …);</div></div>
+            </div>
+          </div>
+          <div class="window">
+            <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url" data-layout-ignore>localhost/users/signup</span></div>
+            <img src="assets/screens/form-signup-errors.png" alt="회원가입 오류 화면" />
+            <div id="ch07-ring-focus" class="ring" style="left: 50px; top: 309px; width: 680px; height: 36px"></div>
+            <div id="ch07-ring-errs" class="ring" style="left: 50px; top: 116px; width: 680px; height: 72px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4) 페이지 번호 1부터 -->
+      <div id="ch07-l4" class="layer" data-hold>
+        <div class="title">페이지 번호는 1부터</div>
+        <div class="two">
+          <div><div class="label">question_list.html (교재)</div><div class="codebox">${#numbers.sequence(<span class="bad">0</span>, paging.totalPages-1)}
+&lt;a th:text="${page}"&gt;   <span class="c">// 화면에 0 이 보임</span></div></div>
+          <div><div class="label">QuestionController (개선)</div><div class="codebox">@RequestParam(defaultValue = <span class="hl">"1"</span>) int page
+int pageIndex = <span class="hl">Math.max(page, 1) - 1</span>;
+<span class="c">// 화면·URL 은 1부터, 내부는 0부터</span></div></div>
+        </div>
+      </div>
+
+      <!-- 5) 검색어는 URL 에 -->
+      <div id="ch07-l5" class="layer" data-hold>
+        <div class="title">검색어는 URL에</div>
+        <div class="split">
+          <div class="stack">
+            <div><div class="label">question_list.html (교재)</div><div class="codebox">&lt;form <span class="bad">id="searchForm"</span>&gt;  <span class="c">// 숨은 폼</span>
+document.getElementById(<span class="bad">'searchForm'</span>)
+  .submit();</div></div>
+            <div><div class="label">list.html (개선)</div><div class="codebox">&lt;form th:action="@{/questions}" <span class="hl">method="get"</span>&gt;
+@{/questions(page=${page}, <span class="hl">kw=${kw}</span>)}</div></div>
+          </div>
+          <div class="window">
+            <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url" data-layout-ignore>localhost/questions?kw=[29</span></div>
+            <img src="assets/screens/form-search.png" alt="검색 결과" />
+          </div>
+        </div>
+      </div>
+
       <script>
         (() => {
-          // build.py 가 내레이션 길이에 맞춰 채운다: CUES[i] = i번째 문장이 시작되는 시간(장 기준 초)
-          const CUES = /*CUES*/[]/*END*/;
-          const DUR = /*DUR*/4.0/*END*/;
+          const CUES = /*CUES*/[0.0, 4.358, 12.436, 18.786, 23.504, 30.094, 37.908, 45.842, 52.408]/*END*/;
+          const DUR = /*DUR*/66.456/*END*/;
           const at = (i, offset = 0) => (CUES[i] ?? 0) + offset;
-
+          const ease = "power3.out";
           const tl = gsap.timeline({ paused: true });
-          tl.from("#ch07-kicker", { opacity: 0, y: 30, duration: 0.5, ease: "power3.out" }, at(0, 0.1));
-          tl.from("#ch07-hero", { opacity: 0, y: 40, duration: 0.6, ease: "power3.out" }, at(0, 0.3));
+          const swap = (from, to, t) => {
+            tl.to(`#ch07-l${from}`, { opacity: 0, duration: 0.35 }, t - 0.1);
+            tl.to(`#ch07-l${to}`, { opacity: 1, duration: 0.35 }, t + 0.15);
+          };
+
+          tl.from("#ch07-l0 .hero", { opacity: 0, y: 40, duration: 0.6, ease }, 0.2);
+
+          // record 폼
+          swap(0, 1, at(1));
+          tl.from("#ch07-l1 .two > *", { opacity: 0, y: 24, duration: 0.45, ease, stagger: 1.6 }, at(1, 0.4));
+
+          // 오류 정렬 → 첫 오류 포커스
+          swap(1, 2, at(2));
+          tl.from("#ch07-l2 .window", { opacity: 0, x: 30, duration: 0.5, ease }, at(2, 0.3));
+          tl.to("#ch07-ring-errs", { opacity: 1, duration: 0.3 }, at(2, 1.5));
+          tl.to("#ch07-ring-errs", { opacity: 0, duration: 0.3 }, at(3));
+          tl.to("#ch07-ring-focus", { opacity: 1, duration: 0.3, repeat: 3, yoyo: true }, at(3, 0.2));
+          tl.set("#ch07-ring-focus", { opacity: 1 }, at(3, 1.6));
+
+          // 같은 화면에서 중복 항목별 안내
+          tl.to("#ch07-ring-focus", { opacity: 0, duration: 0.3 }, at(4));
+          tl.to("#ch07-t-a", { opacity: 0, duration: 0.25 }, at(4));
+          tl.to("#ch07-t-b", { opacity: 1, duration: 0.3 }, at(4, 0.2));
+          tl.to("#ch07-2a", { opacity: 0, duration: 0.3 }, at(4));
+          tl.to("#ch07-2b", { opacity: 1, duration: 0.35 }, at(4, 0.2));
+          tl.to("#ch07-ring-errs", { opacity: 1, duration: 0.3 }, at(5, 0.5));
+
+          // 페이지 1부터
+          swap(2, 4, at(6));
+          tl.from("#ch07-l4 .two > *", { opacity: 0, y: 24, duration: 0.45, ease, stagger: 1.4 }, at(6, 0.3));
+
+          // 검색어 URL
+          swap(4, 5, at(7));
+          tl.from("#ch07-l5 .window", { opacity: 0, x: 30, duration: 0.5, ease }, at(8));
+
           window.__timelines = window.__timelines || {};
           window.__timelines["ch07"] = tl;
         })();
