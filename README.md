@@ -134,3 +134,17 @@
   - **(개선) 수정은 `save()` 재호출 없이 변경 감지(Dirty Checking)**: 교재는 `setSubject` 후 `save()`를 다시 호출함
 - 결과
   - `./gradlew test` 14건 통과
+
+### [007] feat(global): 개발용 샘플 데이터 자동 생성 (BaseInitData)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/007)
+- 출처: 14163 14강(TestInitData), 14168 2강(BaseInitData)
+- 작업
+  - `ApplicationRunner`로 앱 시작 직후 질문 2개 + 답변 2개 생성, 이미 데이터가 있으면 건너뜀
+  - `@Profile("dev")`로 개발 환경에서만 실행
+- 이유
+  - 화면을 만들 때마다 H2 콘솔에서 손으로 데이터를 넣지 않아도 되게 (교재에는 없는 강사 방식)
+  - `self`(@Lazy 자기 주입)로 호출하는 이유: `@Transactional`은 프록시를 거쳐야 동작하는데, `this.work1()`은 프록시를 거치지 않음
+  - **(개선) `@Profile("dev")`**: 강사 코드는 테스트에서도 샘플 데이터가 들어가서 테스트 결과가 샘플 데이터에 따라 바뀜. [006]의 테스트는 자기 데이터를 직접 만드므로 테스트에서는 꺼 둠
+- 결과
+  - 개발 서버 재시작 시 `insert into question`, `insert into answer` SQL 로그 확인
+  - `./gradlew test` 14건 통과 (test 프로필에서는 샘플 데이터 미생성)
