@@ -732,3 +732,17 @@
 - 결과
   - `QuestionRepositoryTest` 11 tests, 0 failures (영상용으로 재실행)
   - `hyperframes check` 통과, 스냅샷으로 장면 확인
+
+### [044] feat(video): N+1 문제 장 (음성 71초, 쿼리 로그 12줄 → 설정 한 줄 → 실제 PASS/FAIL 두 번)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/044)
+- 출처: 대본 [039] `04-nplus1.txt`, README [024], 교재 저장소 `question_list.html`
+- 작업
+  - N+1 장 내레이션 생성 (14문장, 71초 + 결과 화면 여유 8초)
+  - `compositions/04-nplus1.html`: ① 교재 템플릿 한 줄(`#lists.size(question.answerList)`) → ② 실제 SQL 로그 모양으로 12줄이 쌓이며 숫자 0→12 → ③ `default_batch_fetch_size: 100`과 `IN` 절 한 번 → ④ `QuestionListQueryCountTest` 설정 있음 PASS / 설정을 빼면 FAIL(`12L`)
+  - 증거 만들기: 테스트를 설정 있음·없음으로 각각 실제 실행해 결과와 Hibernate SQL 수집, 설정 파일은 실행 후 git 버전으로 복원
+- 이유
+  - "12번"과 "3번"을 말로만 하지 않고, 같은 테스트의 실제 SQL 로그에서 답변 조회가 10번(`question_id=?`) / 1번(`question_id in (...)`)인 것을 확인해 화면에 사용
+  - FAIL 메시지(`Expecting actual: 12L to be less than or equal to: 3L`)도 이번에 다시 실행한 출력 그대로
+- 결과
+  - 설정 있음: 1 test, 0 failures / 설정 없음: 실패 (영상용 재실행), `application.yaml`은 변경 없음
+  - `hyperframes check` 통과, 스냅샷에서 로그 첫 줄 넘침을 발견해 줄임

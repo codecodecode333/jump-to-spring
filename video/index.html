@@ -8,23 +8,24 @@
     <link rel="stylesheet" href="assets/theme.css" />
   </head>
   <body>
-    <div id="root" data-composition-id="main" data-start="0" data-duration="275.532" data-width="1920" data-height="1080">
+    <div id="root" data-composition-id="main" data-start="0" data-duration="350.538" data-width="1920" data-height="1080">
       <!-- 장(서브 컴포지션) -->
       <div id="ch00-host" data-composition-id="ch00" data-composition-src="compositions/00-intro.html" data-start="0.0" data-duration="34.264" data-track-index="0"></div>
       <div id="ch01-host" data-composition-id="ch01" data-composition-src="compositions/01-project.html" data-start="34.264" data-duration="38.07" data-track-index="0"></div>
       <div id="ch02-host" data-composition-id="ch02" data-composition-src="compositions/02-url.html" data-start="72.334" data-duration="78.574" data-track-index="0"></div>
       <div id="ch03-host" data-composition-id="ch03" data-composition-src="compositions/03-entity.html" data-start="150.908" data-duration="100.624" data-track-index="0"></div>
-      <div id="ch04-host" data-composition-id="ch04" data-composition-src="compositions/04-nplus1.html" data-start="251.532" data-duration="4.0" data-track-index="0"></div>
-      <div id="ch05-host" data-composition-id="ch05" data-composition-src="compositions/05-security.html" data-start="255.532" data-duration="4.0" data-track-index="0"></div>
-      <div id="ch06-host" data-composition-id="ch06" data-composition-src="compositions/06-test.html" data-start="259.532" data-duration="4.0" data-track-index="0"></div>
-      <div id="ch07-host" data-composition-id="ch07" data-composition-src="compositions/07-form.html" data-start="263.532" data-duration="4.0" data-track-index="0"></div>
-      <div id="ch08-host" data-composition-id="ch08" data-composition-src="compositions/08-package.html" data-start="267.532" data-duration="4.0" data-track-index="0"></div>
-      <div id="ch09-host" data-composition-id="ch09" data-composition-src="compositions/09-outro.html" data-start="271.532" data-duration="4.0" data-track-index="0"></div>
+      <div id="ch04-host" data-composition-id="ch04" data-composition-src="compositions/04-nplus1.html" data-start="251.532" data-duration="79.006" data-track-index="0"></div>
+      <div id="ch05-host" data-composition-id="ch05" data-composition-src="compositions/05-security.html" data-start="330.538" data-duration="4.0" data-track-index="0"></div>
+      <div id="ch06-host" data-composition-id="ch06" data-composition-src="compositions/06-test.html" data-start="334.538" data-duration="4.0" data-track-index="0"></div>
+      <div id="ch07-host" data-composition-id="ch07" data-composition-src="compositions/07-form.html" data-start="338.538" data-duration="4.0" data-track-index="0"></div>
+      <div id="ch08-host" data-composition-id="ch08" data-composition-src="compositions/08-package.html" data-start="342.538" data-duration="4.0" data-track-index="0"></div>
+      <div id="ch09-host" data-composition-id="ch09" data-composition-src="compositions/09-outro.html" data-start="346.538" data-duration="4.0" data-track-index="0"></div>
       <!-- 내레이션 -->
       <audio id="vo-ch00" class="clip" src="audio/00-intro.mp3" data-start="0.0" data-duration="33.814" data-track-index="2" data-volume="1"></audio>
       <audio id="vo-ch01" class="clip" src="audio/01-project.mp3" data-start="34.264" data-duration="37.62" data-track-index="2" data-volume="1"></audio>
       <audio id="vo-ch02" class="clip" src="audio/02-url.mp3" data-start="72.334" data-duration="78.124" data-track-index="2" data-volume="1"></audio>
       <audio id="vo-ch03" class="clip" src="audio/03-entity.mp3" data-start="150.908" data-duration="92.974" data-track-index="2" data-volume="1"></audio>
+      <audio id="vo-ch04" class="clip" src="audio/04-nplus1.mp3" data-start="251.532" data-duration="71.356" data-track-index="2" data-volume="1"></audio>
       <!-- 배경음악 -->
 
       <!-- 자막 -->
@@ -70,6 +71,20 @@
       <div id="cap-ch03-14" class="clip caption" data-start="225.672" data-duration="5.554" data-track-index="3" data-layout-ignore><span>LAZY는 프록시를 줄 수 있어 getClass 비교는 틀릴 수 있습니다.</span></div>
       <div id="cap-ch03-15" class="clip caption" data-start="231.326" data-duration="5.506" data-track-index="3" data-layout-ignore><span>그래서 Hibernate.getClass로 실제 클래스를 비교합니다.</span></div>
       <div id="cap-ch03-16" class="clip caption" data-start="236.932" data-duration="6.85" data-track-index="3" data-layout-ignore><span>리포지터리 테스트 열한 개로, 이 동작들이 실제 SQL로 실행되는지 확인했습니다.</span></div>
+      <div id="cap-ch04-00" class="clip caption" data-start="251.532" data-duration="4.642" data-track-index="3" data-layout-ignore><span>세 번째, N+1 문제입니다.</span></div>
+      <div id="cap-ch04-01" class="clip caption" data-start="256.274" data-duration="7.402" data-track-index="3" data-layout-ignore><span>교재 3장은 목록 제목 옆에 답변 개수를 보여 줍니다. 코드는 한 줄이죠.</span></div>
+      <div id="cap-ch04-02" class="clip caption" data-start="263.776" data-duration="4.306" data-track-index="3" data-layout-ignore><span>그런데 이 한 줄이 쿼리를 몇 번 실행할까요?</span></div>
+      <div id="cap-ch04-03" class="clip caption" data-start="268.182" data-duration="4.714" data-track-index="3" data-layout-ignore><span>질문 열 개 조회 한 번, 전체 개수 한 번,</span></div>
+      <div id="cap-ch04-04" class="clip caption" data-start="272.996" data-duration="5.386" data-track-index="3" data-layout-ignore><span>그리고 질문마다 답변 조회가 따로, 열 번 나갑니다.</span></div>
+      <div id="cap-ch04-05" class="clip caption" data-start="278.482" data-duration="4.45" data-track-index="3" data-layout-ignore><span>목록 한 페이지에 SQL이 열두 번입니다.</span></div>
+      <div id="cap-ch04-06" class="clip caption" data-start="283.032" data-duration="5.65" data-track-index="3" data-layout-ignore><span>질문 수만큼 쿼리가 늘어나서 N+1 문제라고 부릅니다.</span></div>
+      <div id="cap-ch04-07" class="clip caption" data-start="288.782" data-duration="5.506" data-track-index="3" data-layout-ignore><span>해결은 설정 한 줄, default_batch_fetch_size: 100입니다.</span></div>
+      <div id="cap-ch04-08" class="clip caption" data-start="294.388" data-duration="4.618" data-track-index="3" data-layout-ignore><span>이제 답변을 IN 절로 한 번에 묶어서 가져옵니다.</span></div>
+      <div id="cap-ch04-09" class="clip caption" data-start="299.106" data-duration="3.922" data-track-index="3" data-layout-ignore><span>엔티티 코드는 하나도 바꾸지 않았습니다.</span></div>
+      <div id="cap-ch04-10" class="clip caption" data-start="303.128" data-duration="3.898" data-track-index="3" data-layout-ignore><span>줄었는지는 테스트로 증명했습니다.</span></div>
+      <div id="cap-ch04-11" class="clip caption" data-start="307.126" data-duration="5.674" data-track-index="3" data-layout-ignore><span>하이버네이트 통계로 쿼리 수를 세서, 세 번 이하면 통과합니다.</span></div>
+      <div id="cap-ch04-12" class="clip caption" data-start="312.9" data-duration="5.218" data-track-index="3" data-layout-ignore><span>설정을 일부러 빼고 돌리면, 열두 번으로 실패합니다.</span></div>
+      <div id="cap-ch04-13" class="clip caption" data-start="318.218" data-duration="4.57" data-track-index="3" data-layout-ignore><span>설정의 효과를 실패하는 테스트로 확인한 겁니다.</span></div>
     </div>
     <script>
       window.__timelines = window.__timelines || {};

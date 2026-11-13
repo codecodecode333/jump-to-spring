@@ -1,22 +1,161 @@
 <!doctype html>
 <html lang="ko">
   <body>
-    <!-- 03 · N+1 문제: 장면은 이 div 안에 작성. id 는 다른 장과 겹치지 않게 ch04- 로 시작 -->
+    <!-- 03 N+1: 제목 → ① 교재 템플릿 한 줄 → ② 쿼리 로그 12줄 → ③ 설정 한 줄, IN 절 1번 → ④ 설정 있음 PASS / 없음 FAIL(실제 실행) -->
     <div id="ch04" class="chapter" data-composition-id="ch04" data-width="1920" data-height="1080">
-      <div class="stage center">
-        <div id="ch04-kicker" class="kicker">03 · N+1 문제</div>
-        <div id="ch04-hero" class="hero">목록 SQL 12번 → 3번</div>
+      <style>
+        #ch04 .layer { position: absolute; inset: 0; padding: 80px 140px 190px; display: flex; flex-direction: column; justify-content: center; opacity: 0; }
+        #ch04 .layer.first { opacity: 1; }
+        #ch04 .steps { display: flex; gap: 16px; margin-bottom: 10px; }
+        #ch04 .steps .step { margin-bottom: 0; }
+        #ch04 .label { font-size: 28px; color: var(--muted); margin: 0 0 10px 4px; font-weight: 700; }
+        #ch04 .codebox { font-size: 30px; padding: 26px 32px; }
+        #ch04 .ask { font-size: 64px; font-weight: 800; margin-top: 40px; opacity: 0; }
+        #ch04 .ask em { font-style: normal; color: var(--warn); }
+
+        #ch04 .logwrap { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 40px; align-items: center; }
+        #ch04 .log { font-family: var(--font-code); font-size: 28px; line-height: 1.45; background: #020617; border: 2px solid var(--line);
+          border-radius: 20px; padding: 22px 30px; }
+        #ch04 .log div { opacity: 0; white-space: nowrap; }
+        #ch04 .log .q { color: #93c5fd; }
+        #ch04 .log .c { color: #c4b5fd; }
+        #ch04 .log .a { color: var(--before); }
+        #ch04 .counter { text-align: center; }
+        #ch04 .counter .v { font-size: 200px; font-weight: 900; line-height: 1; color: var(--before); letter-spacing: -0.04em; }
+        #ch04 .counter .l { font-size: 36px; font-weight: 700; color: var(--muted); }
+        #ch04 .nplus1 { font-size: 40px; font-weight: 800; color: var(--warn); margin-top: 18px; opacity: 0; }
+
+        #ch04 .fixwrap { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 40px; align-items: center; }
+        #ch04 .counter.good .v { color: var(--spring); }
+        #ch04 .zero { margin-top: 26px; font-size: 34px; color: var(--spring); font-weight: 700; opacity: 0; }
+
+        #ch04 .proof { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 30px; }
+        #ch04 .term { font-size: 28px; }
+        #ch04 .term h4 { font-family: var(--font-display); font-size: 32px; margin-bottom: 12px; }
+        #ch04 .assert { margin-top: 26px; }
+      </style>
+
+      <!-- 0) 제목 -->
+      <div id="ch04-l0" class="layer first center" data-hold>
+        <div class="kicker">03 · N+1 문제</div>
+        <div class="hero">목록 SQL<br /><em>12번 → 3번</em></div>
       </div>
+
+      <!-- 1) ① 교재 방식: 답변 개수 한 줄 (pahkey/sbb3 question_list.html) -->
+      <div id="ch04-l1" class="layer" data-hold>
+        <div class="steps"><span class="step book">① 교재 방식</span></div>
+        <div class="title">답변 개수 표시, 코드는 한 줄</div>
+        <div class="label">question_list.html (교재)</div>
+        <div class="codebox">&lt;span th:text="<span class="hl">${#lists.size(question.answerList)}</span>"&gt;&lt;/span&gt;</div>
+        <div id="ch04-ask" class="ask">이 한 줄이 쿼리를 <em>몇 번</em> 실행할까?</div>
+      </div>
+
+      <!-- 2) ② 문제점: 실제 로그 형태 (설정 없을 때 실행한 테스트의 Hibernate SQL) -->
+      <div id="ch04-l2" class="layer" data-hold>
+        <div class="steps"><span class="step problem">② 문제점</span></div>
+        <div class="logwrap">
+          <div class="log">
+            <div class="q">select … from question q1_0 order by q1_0.id desc … fetch first ? rows only</div>
+            <div class="c">select count(q1_0.id) from question q1_0</div>
+            <div class="a">select … from answer a1_0 where a1_0.question_id=?</div>
+            <div class="a">select … from answer a1_0 where a1_0.question_id=?</div>
+            <div class="a">select … from answer a1_0 where a1_0.question_id=?</div>
+            <div class="a">select … from answer a1_0 where a1_0.question_id=?</div>
+            <div class="a">select … from answer a1_0 where a1_0.question_id=?</div>
+            <div class="a">select … from answer a1_0 where a1_0.question_id=?</div>
+            <div class="a">select … from answer a1_0 where a1_0.question_id=?</div>
+            <div class="a">select … from answer a1_0 where a1_0.question_id=?</div>
+            <div class="a">select … from answer a1_0 where a1_0.question_id=?</div>
+            <div class="a">select … from answer a1_0 where a1_0.question_id=?</div>
+          </div>
+          <div class="counter"><div id="ch04-n" class="v">0</div><div class="l">SQL 실행</div><div id="ch04-np" class="nplus1">1 + 1 + N(10)</div></div>
+        </div>
+      </div>
+
+      <!-- 3) ③ 개선: 설정 한 줄 → 답변은 IN 절 한 번 -->
+      <div id="ch04-l3" class="layer" data-hold>
+        <div class="steps"><span class="step fix">③ 개선 코드</span></div>
+        <div class="fixwrap">
+          <div>
+            <div class="label">application.yaml</div>
+            <div class="codebox" style="margin-bottom: 26px">spring.jpa.properties.hibernate.
+  <span class="hl">default_batch_fetch_size: 100</span></div>
+            <div class="label">실행된 답변 조회 (설정 있음)</div>
+            <div class="log" style="font-size: 28px"><div class="a" style="opacity:1; color: var(--spring)">select … from answer a1_0
+  where a1_0.question_id <span class="hl">in (?, ?, ?, … ?)</span></div></div>
+            <div id="ch04-zero" class="zero">엔티티 코드 변경: 0줄</div>
+          </div>
+          <div class="counter good"><div class="v">3</div><div class="l">SQL 실행</div></div>
+        </div>
+      </div>
+
+      <!-- 4) ④ 결과: QuestionListQueryCountTest 실제 실행 두 번 -->
+      <div id="ch04-l4" class="layer" data-hold>
+        <div class="steps"><span class="step proof">④ 결과 증명</span></div>
+        <div class="title" style="margin-bottom: 26px">쿼리 수를 세는 테스트</div>
+        <div class="proof">
+          <div class="term"><h4 style="color: var(--spring)">설정 있음</h4>QuestionListQueryCountTest
+<span class="ok">PASSED</span>  1 test, 0 failures
+답변 조회 1번 (IN 절)</div>
+          <div id="ch04-fail" class="term"><h4 style="color: var(--before)">설정을 빼면</h4>QuestionListQueryCountTest
+<span class="fail">FAILED</span>  Expecting actual:
+  <span class="fail">12L</span>
+to be less than or equal to:
+  3L</div>
+        </div>
+        <div class="codebox assert"><span class="c">// Hibernate 통계로 목록 요청 한 번에 실행된 SQL 수를 센다</span>
+assertThat(stats.getPrepareStatementCount()).<span class="hl">isLessThanOrEqualTo(3)</span>;</div>
+      </div>
+
       <script>
         (() => {
-          // build.py 가 내레이션 길이에 맞춰 채운다: CUES[i] = i번째 문장이 시작되는 시간(장 기준 초)
-          const CUES = /*CUES*/[]/*END*/;
-          const DUR = /*DUR*/4.0/*END*/;
+          const CUES = /*CUES*/[0.0, 4.742, 12.244, 16.65, 21.464, 26.95, 31.5, 37.25, 42.856, 47.574, 51.596, 55.594, 61.368, 66.686]/*END*/;
+          const DUR = /*DUR*/79.006/*END*/;
           const at = (i, offset = 0) => (CUES[i] ?? 0) + offset;
-
+          const ease = "power3.out";
           const tl = gsap.timeline({ paused: true });
-          tl.from("#ch04-kicker", { opacity: 0, y: 30, duration: 0.5, ease: "power3.out" }, at(0, 0.1));
-          tl.from("#ch04-hero", { opacity: 0, y: 40, duration: 0.6, ease: "power3.out" }, at(0, 0.3));
+          const swap = (from, to, t) => {
+            tl.to(`#ch04-l${from}`, { opacity: 0, duration: 0.35 }, t - 0.1);
+            tl.to(`#ch04-l${to}`, { opacity: 1, duration: 0.35 }, t + 0.15);
+          };
+
+          tl.from("#ch04-l0 .hero", { opacity: 0, y: 40, duration: 0.6, ease }, 0.2);
+
+          // ① 교재 방식
+          swap(0, 1, at(1));
+          tl.from("#ch04-l1 .codebox", { opacity: 0, y: 24, duration: 0.5, ease }, at(1, 0.4));
+          tl.to("#ch04-ask", { opacity: 1, duration: 0.4 }, at(2));
+
+          // ② 쿼리 로그가 한 줄씩 쌓이고 숫자가 올라간다
+          swap(1, 2, at(3));
+          const lines = "#ch04-l2 .log div";
+          const n = { v: 0 };
+          const setN = (v, t) => tl.to(n, { v, duration: 0.25, onUpdate: () => {
+            document.getElementById("ch04-n").textContent = Math.round(n.v);
+          } }, t);
+          tl.to(`${lines}:nth-child(1)`, { opacity: 1, duration: 0.25 }, at(3, 0.4)); setN(1, at(3, 0.4));
+          tl.to(`${lines}:nth-child(2)`, { opacity: 1, duration: 0.25 }, at(3, 2.4)); setN(2, at(3, 2.4));
+          const step = ((CUES[5] ?? DUR) - at(4) - 0.6) / 10;
+          for (let k = 0; k < 10; k++) {
+            tl.to(`${lines}:nth-child(${k + 3})`, { opacity: 1, duration: 0.2 }, at(4, 0.3 + k * step));
+            setN(3 + k, at(4, 0.3 + k * step));
+          }
+          tl.to("#ch04-np", { opacity: 1, duration: 0.4 }, at(6));
+
+          // ③ 설정 한 줄
+          swap(2, 3, at(7));
+          tl.from("#ch04-l3 .codebox", { opacity: 0, y: 24, duration: 0.5, ease }, at(7, 0.3));
+          tl.from("#ch04-l3 .log, #ch04-l3 .label:nth-of-type(2)", { opacity: 0, y: 24, duration: 0.5, ease }, at(8));
+          tl.from("#ch04-l3 .counter", { opacity: 0, scale: 0.8, duration: 0.5, ease }, at(8, 0.6));
+          tl.to("#ch04-zero", { opacity: 1, duration: 0.4 }, at(9));
+
+          // ④ 실제 실행 두 번
+          swap(3, 4, at(10));
+          tl.from("#ch04-l4 .assert", { opacity: 0, y: 24, duration: 0.5, ease }, at(11));
+          tl.from("#ch04-l4 .proof > :first-child", { opacity: 0, y: 24, duration: 0.5, ease }, at(11, 1.2));
+          tl.from("#ch04-fail", { opacity: 0, y: 24, duration: 0.5, ease }, at(12));
+          tl.to("#ch04-fail", { borderColor: "#f87171", duration: 0.3 }, at(12, 0.8));
+
           window.__timelines = window.__timelines || {};
           window.__timelines["ch04"] = tl;
         })();
