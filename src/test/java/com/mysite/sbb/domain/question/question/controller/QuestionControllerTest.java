@@ -107,4 +107,23 @@ class QuestionControllerTest {
                 .bodyText()
                 .contains("value=\"제목만 입력\"");
     }
+
+    @Test
+    @DisplayName("GET /questions?page=N: 한 페이지에 10개, 최신 글부터")
+    void listPaging() {
+        for (int i = 1; i <= 23; i++) questionRepository.save(new Question("페이징 %02d".formatted(i), "내용"));
+        // 총 25개 → 1페이지: 페이징 23 ~ 14, 3페이지: 나머지 5개
+
+        assertThat(mvc.get().uri("/questions"))
+                .hasStatusOk()
+                .bodyText()
+                .contains("페이징 23", "페이징 14")
+                .doesNotContain("페이징 13");
+
+        assertThat(mvc.get().uri("/questions?page=3"))
+                .hasStatusOk()
+                .bodyText()
+                .contains("sbb가 무엇인가요?", "페이징 03")
+                .doesNotContain("페이징 04");
+    }
 }

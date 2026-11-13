@@ -32,7 +32,10 @@ public class BaseInitData {
 
     @Bean
     ApplicationRunner baseInitDataApplicationRunner() {
-        return args -> self.work1();
+        return args -> {
+            self.work1();
+            self.work2();
+        };
     }
 
     @Transactional
@@ -45,5 +48,15 @@ public class BaseInitData {
         q2.addAnswer("네 자동으로 생성됩니다.");
         q2.addAnswer("맞습니다!");
         questionRepository.save(q2);
+    }
+
+    // 페이징 확인용 질문 300개
+    @Transactional
+    public void work2() {
+        if (questionRepository.count() >= 300) return;
+
+        for (int i = 1; i <= 300; i++) {
+            questionRepository.save(new Question("테스트 데이터입니다:[%03d]".formatted(i), "내용무"));
+        }
     }
 }

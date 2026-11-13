@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,8 +16,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/questions") // 이 컨트롤러의 모든 URL 앞에 /questions 가 붙는다
@@ -26,9 +26,14 @@ public class QuestionController {
 
     // GET /questions (교재: GET /question/list)
     @GetMapping
-    public String list(Model model) {
-        List<Question> questions = questionService.getList();
-        model.addAttribute("questions", questions); // 템플릿에서 ${questions} 로 사용
+    // 교재는 ?page=0 이 첫 페이지. 개선: 사용자에게 보이는 번호와 같게 ?page=1 이 첫 페이지
+    public String list(
+            @RequestParam(defaultValue = "1") int page,
+            Model model
+    ) {
+        int pageIndex = Math.max(page, 1) - 1; // 0 이하가 들어와도 첫 페이지로
+        Page<Question> paging = questionService.getList(pageIndex);
+        model.addAttribute("paging", paging); // 템플릿에서 ${paging} 로 사용
         return "question/question/list"; // templates/question/question/list.html
     }
 

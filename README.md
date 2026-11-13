@@ -368,3 +368,21 @@
 - 결과
   - 모든 페이지 상단에 `SBB | 로그인` 메뉴 표시 (스크린샷)
   - `./gradlew test` 24건 통과
+
+### [022] feat(question): 질문 목록 페이징 (한 페이지 10개, 최신순)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/022)
+- 출처: 교재 3-02
+- 작업
+  - `QuestionService.getList(page)`: `PageRequest.of(page, 10, Sort.by(desc("id")))` → `Page<Question>`
+  - `GET /questions?page=N` (기본 1), 템플릿에 이전/번호/다음 페이지 링크 (현재 페이지 앞뒤 5개)
+  - `BaseInitData.work2()`: 개발용 질문 300개
+  - 테스트: 25개 중 1페이지는 최신 10개, 3페이지는 남은 5개
+- 이유
+  - 질문이 수백 개가 되면 한 번에 다 가져오는 것은 느리고 보기도 어려움 → `LIMIT/OFFSET` 쿼리로 필요한 10개만 조회
+  - **(개선) 페이지 번호를 1부터**: 교재는 `?page=0`이 첫 페이지이고 화면에도 `0`이 표시됨. 사용자에게 익숙한 1부터 쓰고, 컨트롤러에서 `page - 1`로 변환 (0 이하는 1로 보정)
+  - **(개선) 정렬 기준 `id` 역순**: 교재는 `createDate` 역순. 결과는 같지만 PK는 인덱스가 있어 정렬이 빠름
+  - **(개선) `@{/questions(page=${page})}`**: 교재의 `@{|?page=${page}|}` 문자열 이어붙이기 대신 Thymeleaf의 URL 파라미터 문법 → 값이 자동으로 URL 인코딩됨 (나중에 검색어가 붙을 때 유리)
+  - **(개선) 300개 샘플 데이터를 테스트가 아닌 dev 초기 데이터로**: 교재는 테스트 코드를 실행해 개발 DB에 300개를 넣음. 테스트가 개발 DB를 바꾸면 안 되므로 dev 프로필 초기 데이터로 생성
+- 결과
+  - `/questions?page=2` → `[290]`~`[281]` 표시, 페이지 버튼 `2` 활성화 (스크린샷)
+  - `./gradlew test` 25건 통과
