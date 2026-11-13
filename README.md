@@ -259,3 +259,15 @@
 - 결과
   - 브라우저에서 1번 질문에 답변 등록 → `/questions/1`로 리다이렉트되고 "1개의 답변이 있습니다." 표시
   - `./gradlew test` 19건 통과
+
+### [015] style(question): 상세 페이지에 스타일시트 적용 (static/resource)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/015)
+- 출처: 교재 2-13, 14163 38강, 14168 46강
+- 작업
+  - `static/resource/style.css` (답변 입력창 너비 100%, 버튼 여백), 상세 페이지에 `<link th:href="@{/resource/style.css}">`
+- 이유
+  - `static` 폴더의 파일은 컨트롤러 없이 URL로 바로 제공됨 (`static/resource/style.css` → `/resource/style.css`)
+  - **(개선) `static/resource/` 하위에 배치 (14168 46강)**: 교재는 `static/style.css`. 나중에 스프링 시큐리티에서 "정적 파일은 모두 허용"을 `/resource/**` 한 줄로 설정할 수 있음
+- 결과
+  - `/resource/style.css` → 200 `text/css`
+  - 정적 파일은 빌드 결과물(`build/resources`)에서 제공되므로, 새 파일 추가 후에는 빌드(또는 IDE의 Build) 필요
