@@ -251,4 +251,38 @@ class QuestionControllerTest {
                 .contains("<strong>굵게</strong>", "&lt;script&gt;")
                 .doesNotContain("<script>alert(1)</script>");
     }
+
+    @Test
+    @DisplayName("GET /questions?kw=: 제목·내용·글쓴이·답변 내용으로 검색한다")
+    void search() {
+        userService.create("searcher", "s@test.com", "1234");
+        Question byAuthor = questionRepository.save(new Question("글쓴이로 찾기", "내용", userService.getUser("searcher")));
+        Question byAnswer = new Question("답변으로 찾기", "내용", null);
+        byAnswer.addAnswer("답변에만 있는 특별한단어", null);
+        byAnswer.addAnswer("특별한단어 두 번째", null); // 답변이 2개 걸려도 질문은 1번만 나와야 한다
+        questionRepository.save(byAnswer);
+
+        assertThat(mvc.get().uri("/questions?kw=searcher"))
+                .bodyText().contains("글쓴이로 찾기").doesNotContain("sbb가 무엇인가요?");
+
+        assertThat(mvc.get().uri("/questions?kw=특별한단어"))
+                .bodyText()
+                .contains("답변으로 찾기")
+                .doesNotContain("글쓴이로 찾기")
+                .containsOnlyOnce(">답변으로 찾기<");
+
+        assertThat(mvc.get().uri("/questions?kw=sbb"))
+                .bodyText().contains("sbb가 무엇인가요?").doesNotContain("스프링부트 모델 질문입니다.");
+    }
+
+    @Test
+    @DisplayName("검색 중 페이지 링크에는 검색어가 유지된다")
+    void searchPagingKeepsKeyword() {
+        for (int i = 1; i <= 12; i++) questionRepository.save(new Question("검색페이징 %02d".formatted(i), "내용", null));
+
+        assertThat(mvc.get().uri("/questions?kw=검색페이징"))
+                .bodyText()
+                .contains("value=\"검색페이징\"")
+                .contains("/questions?page=2&amp;kw=");
+    }
 }

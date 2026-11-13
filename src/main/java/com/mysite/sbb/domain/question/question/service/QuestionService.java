@@ -27,10 +27,14 @@ public class QuestionService {
     public static final int PAGE_SIZE = 10;
 
     // page: 0부터 시작하는 페이지 번호 (스프링 데이터 규칙)
-    public Page<Question> getList(int page) {
+    // kw: 검색어. 비어 있으면 전체 목록
+    public Page<Question> getList(int page, String kw) {
         // 최신 글이 먼저 오도록 id 역순 정렬. (PK 라 인덱스가 있어 createDate 정렬보다 유리)
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by(Sort.Order.desc("id")));
-        return questionRepository.findAll(pageable); // SELECT ... LIMIT 10 OFFSET ? + 전체 개수 COUNT 쿼리
+        if (kw == null || kw.isBlank()) {
+            return questionRepository.findAll(pageable); // 검색어가 없으면 불필요한 조인 없이 조회
+        }
+        return questionRepository.search(kw.trim(), pageable);
     }
 
     public Question getQuestion(Long id) {

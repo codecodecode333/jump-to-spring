@@ -604,3 +604,20 @@
   - 0.32.0은 공개된 지 2주 남짓이라 검증된 0.31.0 사용
 - 결과
   - `./gradlew test` 55건 통과
+
+### [036] feat(question): 질문 검색 (제목·내용·글쓴이·답변)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/036)
+- 출처: 교재 3-13
+- 작업
+  - `QuestionRepository.search(kw, pageable)`: JPQL `@Query` + `left join`(글쓴이, 답변, 답변 글쓴이) + `distinct`
+  - `QuestionService.getList(page, kw)`: 검색어가 비어 있으면 조인 없는 `findAll`
+  - `GET /questions?kw=...&page=N`, 목록 상단에 검색창, 페이지 링크에 검색어 유지
+  - 테스트: 글쓴이·답변 내용·제목 검색, 답변이 여러 개 걸려도 질문은 한 번, 페이지 링크에 `kw` 포함
+- 이유
+  - **JPQL**: 테이블이 아니라 엔티티와 필드 이름(`q.author`, `q.answers`)으로 조인 → 연관관계를 따라가며 쿼리를 쓸 수 있음
+  - `left join`이어야 답변이나 글쓴이가 없는 질문도 검색됨, `distinct`가 없으면 답변 수만큼 같은 질문이 반복됨 (테스트로 고정)
+  - **(개선) 검색 폼을 그냥 GET 폼으로**: 교재는 숨은 `searchForm` + JS로 `page`, `kw`를 채워 전송함. Thymeleaf의 `@{/questions(page=..., kw=${kw})}`로 링크에 검색어를 붙이면 JS가 필요 없고, 검색 결과 URL을 공유·북마크할 수 있음
+  - **(개선) 교재는 Specification → `@Query` 두 가지를 소개**: 여기서는 읽기 쉬운 `@Query` 하나만 사용, 검색어가 없을 때는 불필요한 조인을 하지 않도록 분기
+- 결과
+  - 브라우저: `[29`로 검색 → `[290]`~`[299]` 10건, 검색창에 검색어 유지 (스크린샷)
+  - `./gradlew test` 57건 통과

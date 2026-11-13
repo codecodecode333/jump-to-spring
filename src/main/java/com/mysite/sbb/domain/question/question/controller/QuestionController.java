@@ -39,10 +39,12 @@ public class QuestionController {
     // 교재는 ?page=0 이 첫 페이지. 개선: 사용자에게 보이는 번호와 같게 ?page=1 이 첫 페이지
     public String list(
             @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "") String kw, // 검색어
             Model model
     ) {
         int pageIndex = Math.max(page, 1) - 1; // 0 이하가 들어와도 첫 페이지로
-        Page<Question> paging = questionService.getList(pageIndex);
+        Page<Question> paging = questionService.getList(pageIndex, kw);
+        model.addAttribute("kw", kw); // 검색창과 페이지 링크에서 검색어 유지
         model.addAttribute("paging", paging); // 템플릿에서 ${paging} 로 사용
         return "question/question/list"; // templates/question/question/list.html
     }
