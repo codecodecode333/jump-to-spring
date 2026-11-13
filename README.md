@@ -118,3 +118,19 @@
 - 결과
   - 앱 실행 시 `question`, `answer` 테이블 생성, `answer.question_id` 외래키(FK) 생성 확인 (id는 `bigint identity`)
   - `./gradlew test` 3건 통과
+
+### [006] feat(question): Question·Answer 리포지터리와 쿼리 메서드, 리포지터리 테스트
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/006)
+- 출처: 교재 2-05, 14163 14~25강
+- 작업
+  - `QuestionRepository`(`findBySubject`, `findBySubjectAndContent`, `findBySubjectLike`), `AnswerRepository`
+  - `Question.modify(subject, content)` 추가
+  - `QuestionRepositoryTest` 11건: 저장, 조회, 쿼리 메서드, 수정, 삭제, 답변 생성·조회, orphanRemoval
+- 이유
+  - 교재처럼 리포지터리 사용법을 **테스트 코드로** 익힘 (교재·강사 방식)
+  - **(개선) `@DataJpaTest`**: 강사는 `@SpringBootTest`(앱 전체)를 띄웠지만, 리포지터리 테스트는 JPA 부분만 띄우면 더 빠르고 범위가 명확함
+  - **(개선) 테스트가 스스로 데이터 준비(`@BeforeEach`)**: 강사 테스트는 샘플 데이터(`TestInitData`)에 의존해 `findById(1)`처럼 id를 가정함 → 샘플 데이터를 바꾸면 테스트가 깨짐. 각 테스트가 자기 데이터를 만들고 롤백되게 함
+  - **(개선) `em.flush()` + `em.clear()`**: 1차 캐시를 비워야 "정말 DB에 반영됐는지"를 확인할 수 있음 (변경 감지 UPDATE, cascade INSERT/DELETE 시점 학습)
+  - **(개선) 수정은 `save()` 재호출 없이 변경 감지(Dirty Checking)**: 교재는 `setSubject` 후 `save()`를 다시 호출함
+- 결과
+  - `./gradlew test` 14건 통과

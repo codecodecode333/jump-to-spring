@@ -34,6 +34,11 @@ public class Question extends BaseEntity {
         this.content = content;
     }
 
+    public void modify(String subject, String content) {
+        this.subject = subject;
+        this.content = content;
+    }
+
     // 답변은 항상 질문을 통해서 만든다. (양방향 관계의 양쪽을 한 번에 맞춰 준다)
     public Answer addAnswer(String content) {
         Answer answer = new Answer(this, content);
