@@ -1,0 +1,21 @@
+<!-- 폼 검증 오류 목록. th:object 가 지정된 form 안에서 th:replace 로 사용한다. -->
+<th:block th:fragment="formErrorsFragment">
+    <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
+        <ul class="mb-0">
+            <!-- 메시지 "01-subject-제목은..." → 번호로 정렬, 필드명은 data 속성에, 화면에는 실제 메시지만 -->
+            <li th:each="err : ${#fields.allErrors().stream().sorted().toList()}"
+                th:with="errStrs = ${err.split('-', 3)}"
+                th:data-error-field-name="${errStrs[1]}"
+                th:text="${errStrs[2]}"></li>
+        </ul>
+    </div>
+    <script>
+        // 이 프래그먼트를 포함한 폼(가장 최근에 그려진 폼)에서 첫 번째 오류 필드에 포커스
+        (() => {
+            const forms = document.querySelectorAll('form');
+            const form = forms[forms.length - 1];
+            const fieldName = form?.querySelector('[data-error-field-name]')?.dataset.errorFieldName;
+            if (fieldName && form[fieldName]) setTimeout(() => form[fieldName].focus());
+        })();
+    </script>
+</th:block>

@@ -318,3 +318,23 @@
 - 결과
   - 브라우저에서 질문 등록 → `/questions/3`으로 이동, 제목·내용 표시 (탭 제목 `테스트 질문입니다 | SBB`)
   - `./gradlew test` 21건 통과
+
+### [019] feat(question): 질문 등록 입력값 검증 (record 폼, @Valid, 오류 프래그먼트)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/019)
+- 출처: 교재 2-16, 14168 9~25강·40강
+- 작업
+  - `spring-boot-starter-validation` 의존성
+  - `QuestionController.WriteForm` record: `@NotBlank`, `@Size(max = 200)`
+  - `@ModelAttribute("form") @Valid WriteForm form, BindingResult bindingResult` → 실패 시 폼 다시 렌더링
+  - `write.html`: `th:object="${form}"`, `th:field="*{subject}"`
+  - `templates/form_errors.html` 프래그먼트: 오류를 번호순으로 정렬해 표시하고 첫 오류 필드에 포커스
+  - 테스트: 빈 값이면 저장 안 됨 + 오류 메시지, 입력값 유지
+- 이유
+  - 빈 제목/내용이 DB에 저장되는 것을 막기 위해 (서버 검증은 JS를 꺼도 우회할 수 없음, 14168 35~36강)
+  - **(개선) 폼 DTO를 record로 (14168 40강)**: 교재 `QuestionForm`은 `@Getter @Setter` 클래스 + 별도 파일. record는 한 줄로 불변 객체를 만들고, 이 컨트롤러에서만 쓰므로 컨트롤러 안에 둠
+  - **`BindingResult`**: 없으면 검증 실패 시 바로 400 에러 페이지. 있으면 오류를 담아 컨트롤러가 직접 처리 (14168 13강)
+  - **`th:field`**: `id`, `name`, `value`를 자동 생성 → 검증 실패 후에도 입력값이 남아 있음 (14168 10·22강)
+  - **(개선) 오류 메시지 `01-subject-...` 규칙 (14168 23~25강)**: `#fields.allErrors()`는 순서가 보장되지 않음. 번호로 정렬하고, 필드명으로 첫 오류 입력칸에 포커스를 줘서 사용자가 바로 고칠 수 있게
+- 결과
+  - 제목만 입력하고 저장 → 같은 페이지에 "내용은 필수항목입니다." 표시, 제목 입력값 유지 (스크린샷)
+  - `./gradlew test` 23건 통과

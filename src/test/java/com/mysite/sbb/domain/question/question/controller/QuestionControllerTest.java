@@ -79,4 +79,31 @@ class QuestionControllerTest {
         Question saved = questionRepository.findBySubject("새 질문 제목").orElseThrow();
         assertThat(saved.getContent()).isEqualTo("새 질문 내용");
     }
+
+    @Test
+    @DisplayName("POST /questions/write: 제목/내용이 비어 있으면 저장하지 않고 폼과 오류 메시지를 다시 보여준다")
+    void writeInvalid() {
+        long before = questionRepository.count();
+
+        assertThat(mvc.post().uri("/questions/write")
+                .param("subject", " ")
+                .param("content", ""))
+                .hasStatusOk()
+                .hasViewName("question/question/write")
+                .bodyText()
+                .contains("제목은 필수항목입니다.", "내용은 필수항목입니다.");
+
+        assertThat(questionRepository.count()).isEqualTo(before);
+    }
+
+    @Test
+    @DisplayName("POST /questions/write: 검증 실패 시 입력했던 값이 유지된다")
+    void writeInvalidKeepsInput() {
+        assertThat(mvc.post().uri("/questions/write")
+                .param("subject", "제목만 입력")
+                .param("content", ""))
+                .hasStatusOk()
+                .bodyText()
+                .contains("value=\"제목만 입력\"");
+    }
 }

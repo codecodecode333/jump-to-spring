@@ -8,15 +8,17 @@
 <body>
 <div layout:fragment="content" class="container">
     <h5 class="my-3 border-bottom pb-2">질문등록</h5>
-    <!-- th:action 을 비워 두면 현재 URL(/questions/write)로 전송된다 -->
-    <form th:action method="post">
+    <!-- th:object: 이 폼이 다룰 객체. 안에서 *{필드명} 으로 접근 -->
+    <form th:action method="post" th:object="${form}">
+        <div th:replace="~{form_errors :: formErrorsFragment}"></div>
         <div class="mb-3">
             <label for="subject" class="form-label">제목</label>
-            <input type="text" name="subject" id="subject" class="form-control" autofocus>
+            <!-- th:field: id, name, value 를 한 번에 만들어 준다 → 검증 실패 시 입력값 유지 -->
+            <input type="text" th:field="*{subject}" class="form-control" autofocus>
         </div>
         <div class="mb-3">
             <label for="content" class="form-label">내용</label>
-            <textarea name="content" id="content" class="form-control" rows="10"></textarea>
+            <textarea th:field="*{content}" class="form-control" rows="10"></textarea>
         </div>
         <input type="submit" value="저장하기" class="btn btn-primary my-2">
     </form>
