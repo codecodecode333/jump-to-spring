@@ -1,0 +1,14 @@
+package com.mysite.sbb.domain.user.user.repository;
+
+import com.mysite.sbb.domain.user.user.entity.SiteUser;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface UserRepository extends JpaRepository<SiteUser, Long> {
+    Optional<SiteUser> findByUsername(String username);
+
+    boolean existsByUsername(String username); // SELECT ... WHERE username = ? 의 존재 여부만 확인
+
+    boolean existsByEmail(String email);
+}

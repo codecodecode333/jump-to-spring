@@ -432,3 +432,19 @@
 - 결과
   - 목록·상세·H2 콘솔 정상, 상세 페이지 폼에 `_csrf` 숨은 필드 생성 확인
   - `./gradlew test` 28건 통과
+
+### [026] feat(user): 회원 엔티티(SiteUser)와 회원 생성 서비스, BCrypt 비밀번호 암호화
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/026)
+- 출처: 교재 3-06
+- 작업
+  - `domain/user/user`: `SiteUser`(username·email 유니크, password), `UserRepository`(`findByUsername`, `existsByUsername`, `existsByEmail`), `UserService.create()`
+  - `SecurityConfig`에 `PasswordEncoder` 빈(`BCryptPasswordEncoder`)
+  - `UserServiceTest`: 비밀번호가 해시로 저장되는지, 같은 아이디 중복 가입 시 예외
+- 이유
+  - 비밀번호를 평문으로 저장하면 DB가 유출됐을 때 그대로 노출됨 → 단방향 해시(BCrypt)로 저장하고 로그인 시 `matches()`로 비교
+  - BCrypt는 같은 비밀번호도 매번 다른 해시(salt 포함)를 만들어 미리 계산된 표(레인보우 테이블) 공격에 강함
+  - `PasswordEncoder` 인터페이스로 빈을 등록해서, 나중에 암호화 방식을 바꿔도 서비스 코드는 그대로
+  - **(개선) `SiteUser`도 `BaseEntity` 상속 + Setter 없이 생성자로만 생성** (교재는 `@Setter` + `new SiteUser()`)
+  - **(개선) `existsByUsername/Email`**: 다음 단계에서 가입 전에 중복을 미리 검사해 사용자에게 필드별 오류로 알려주기 위해 (DB 유니크 제약은 최종 안전장치로 유지)
+- 결과
+  - `./gradlew test` 30건 통과
