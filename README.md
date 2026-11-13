@@ -97,3 +97,24 @@
 - 결과
   - `./gradlew test` 3건 통과 (test 프로필로 메모리 DB 사용)
   - `/h2-console` 접속 → JDBC URL이 설정값으로 자동 채워지고 Connect 성공
+
+### [005] feat(question): Question·Answer 엔티티 추가, BaseEntity로 공통 필드 분리
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/005)
+- 출처: 교재 2-04, 14163 7~13강·22~25강, 14168 BaseEntity
+- 작업
+  - `BaseEntity`(`@MappedSuperclass`): `id`, `createDate`(`@CreatedDate`), `modifyDate`(`@LastModifiedDate`), `equals/hashCode`
+  - `JpaConfig`에 `@EnableJpaAuditing`
+  - `Question(subject, content, answers)`, `Answer(content, question)` 엔티티
+- 이유 (교재와 다른 점)
+  - **(개선) BaseEntity**: 모든 엔티티에 반복되는 id·작성일·수정일을 한 곳에 모으고, 날짜는 JPA Auditing이 자동으로 채움 → `setCreateDate(LocalDateTime.now())` 반복 제거 (14168)
+  - **(개선) Setter 제거 + `@NoArgsConstructor(access = PROTECTED)`**: 아무 데서나 값을 바꾸지 못하게 하고, 생성자와 의미 있는 메서드(`addAnswer`)로만 상태를 바꿈
+  - **(개선) `question.addAnswer(content)`**: 답변을 질문을 통해 만들어 양방향 관계(`answer.question`과 `question.answers`)가 항상 함께 맞춰짐 (14163 21강)
+  - **(개선) `@ManyToOne(fetch = LAZY)`**: 기본값 EAGER는 답변만 필요할 때도 질문을 조인해서 가져옴 (14163 24~25강)
+  - **(개선) `answers = new ArrayList<>()` 초기화**: 새로 만든 질문에서도 NPE 없이 바로 `add` 가능 (14163 23강)
+  - **(개선) `orphanRemoval = true`**: 리스트에서 뺀 답변은 DB에서도 삭제 → 나중에 답변 삭제를 `question.getAnswers().remove(...)`로 처리 가능
+  - **(개선) `id`를 `Long`으로**: 교재는 `Integer`, 강사는 `int`. `null`이면 "아직 저장 안 됨"이 명확하고 범위도 넓음
+  - **(개선) equals/hashCode 보완**: 14168은 `getClass()` 비교 + `id` 해시 → LAZY 프록시와 비교하면 false, 저장 전후로 해시가 바뀜. `Hibernate.getClass()` 비교 + 클래스 기반 해시로 보완
+  - `@EnableJpaAuditing`을 메인 클래스가 아닌 `JpaConfig`에 둔 이유: `@WebMvcTest`가 메인 클래스를 읽을 때 JPA가 없어 실패하는 문제를 피하기 위해
+- 결과
+  - 앱 실행 시 `question`, `answer` 테이블 생성, `answer.question_id` 외래키(FK) 생성 확인 (id는 `bigint identity`)
+  - `./gradlew test` 3건 통과
