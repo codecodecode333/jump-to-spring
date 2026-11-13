@@ -27,6 +27,9 @@
             <!-- 글쓴이에게만 수정 버튼 -->
             <div class="my-3" th:if="${question.author != null and #authentication.name == question.author.username}">
                 <a th:href="@{|/questions/${question.id}/modify|}" class="btn btn-sm btn-outline-secondary">수정</a>
+                <!-- method, data-confirm 속성은 global.js 가 처리 -->
+                <a th:href="@{|/questions/${question.id}|}" method="delete" data-confirm="정말로 삭제하시겠습니까?"
+                   class="btn btn-sm btn-outline-danger">삭제</a>
             </div>
         </div>
     </div>

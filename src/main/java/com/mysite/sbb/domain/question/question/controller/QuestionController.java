@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -138,5 +139,14 @@ public class QuestionController {
 
         questionService.modify(question, form.subject(), form.content());
         return "redirect:/questions/" + id;
+    }
+
+    // 교재: GET /question/delete/{id} (링크 클릭 = GET 으로 삭제) → 개선: DELETE /questions/{id}
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/{id}")
+    public String delete(@PathVariable Long id, Principal principal) {
+        Question question = getQuestionForAuthor(id, principal);
+        questionService.delete(question);
+        return "redirect:/questions";
     }
 }

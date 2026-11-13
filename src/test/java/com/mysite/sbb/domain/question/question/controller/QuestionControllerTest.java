@@ -204,4 +204,28 @@ class QuestionControllerTest {
 
         assertThat(questionRepository.findById(others.getId()).orElseThrow().getSubject()).isEqualTo("남의 글");
     }
+
+    @Test
+    @DisplayName("DELETE /questions/{id}: 글쓴이는 질문을 삭제할 수 있고, 답변도 함께 삭제된다")
+    void deleteQuestion() {
+        Question mine = new Question("지울 질문", "내용", userService.getUser("user1"));
+        mine.addAnswer("딸린 답변", null);
+        questionRepository.save(mine);
+
+        assertThat(mvc.delete().uri("/questions/{id}", mine.getId()).with(csrf()))
+                .hasRedirectedUrl("/questions");
+
+        assertThat(questionRepository.findById(mine.getId())).isEmpty();
+    }
+
+    @Test
+    @DisplayName("DELETE /questions/{id}: 다른 사람의 질문은 삭제할 수 없다 (403)")
+    void deleteForbidden() {
+        userService.create("user2", "user2@test.com", "1234");
+        Question others = questionRepository.save(new Question("남의 글", "내용", userService.getUser("user2")));
+
+        assertThat(mvc.delete().uri("/questions/{id}", others.getId()).with(csrf()))
+                .hasStatus(403);
+        assertThat(questionRepository.findById(others.getId())).isPresent();
+    }
 }

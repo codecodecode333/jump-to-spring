@@ -519,3 +519,19 @@
 - 결과
   - 브라우저: `user1`로 질문 작성 → 수정 → 상세에 수정된 내용과 `modified at` 표시 (`_method=put` 숨은 필드 확인)
   - `./gradlew test` 44건 통과
+
+### [031] feat(question): 질문 삭제 (DELETE /questions/{id}), global.js로 링크에서 DELETE 전송
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/031)
+- 출처: 교재 3-09, 14168 41·43·44강
+- 작업
+  - `DELETE /questions/{id}`: 글쓴이만 가능(403), 삭제 후 목록으로, cascade로 답변도 삭제
+  - `static/resource/global.js`: `<a method="delete" data-confirm="...">` 클릭 시 확인창 → 숨은 폼(POST + `_method=DELETE` + CSRF 토큰) 전송
+  - `layout.html`: `<meta name="_csrf">`, `<meta name="_csrf_parameter">`, `global.js` 로드
+  - 테스트: 본인 질문 삭제(답변 포함), 남의 질문 403
+- 이유
+  - **(개선) 삭제를 GET 링크로 하지 않음**: 교재는 `<a href="/question/delete/{id}">`(GET). GET은 브라우저 미리 불러오기, 크롤러, 다른 사이트의 `<img>`로도 실행될 수 있어 데이터를 지우는 요청에 쓰면 위험하고 CSRF 보호도 받지 못함
+  - **(개선) `global.js`로 공통화 (14168 43~44강)**: 링크 모양은 유지하면서, `method` 속성만 붙이면 어느 페이지에서든 DELETE/PUT 요청이 되게 함. 교재는 페이지마다 `class="delete"` + 인라인 스크립트로 `location.href` 이동
+  - CSRF 토큰은 Thymeleaf가 폼에만 자동으로 넣어 주므로, JS로 만드는 폼을 위해 레이아웃의 `<meta>`에 토큰을 노출
+- 결과
+  - 브라우저: 상세의 "삭제" 클릭 → 확인 → 목록으로 이동, 해당 질문은 404 (`<meta name="_csrf">` 존재 확인)
+  - `./gradlew test` 46건 통과

@@ -48,4 +48,9 @@ public class QuestionService {
     public void modify(Question question, String subject, String content) {
         question.modify(subject, content); // 변경 감지로 트랜잭션 종료 시 UPDATE (save 호출 불필요)
     }
+
+    @Transactional
+    public void delete(Question question) {
+        questionRepository.delete(question); // cascade REMOVE 로 답변도 함께 삭제
+    }
 }
