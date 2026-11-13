@@ -242,3 +242,20 @@
   - 클래스 이름과 URL 프리픽스가 1:1로 대응되어 "이 URL은 어느 컨트롤러?"를 바로 찾을 수 있음
 - 결과
   - URL 변화 없음, `./gradlew test` 17건 통과
+
+### [014] feat(answer): 답변 등록 (POST /questions/{id}/answers)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/014)
+- 출처: 교재 2-12, 14163 37강
+- 작업
+  - `AnswerService.create(questionId, content)`: 질문을 조회한 뒤 `question.addAnswer(content)`
+  - `AnswerController`(`@RequestMapping("/questions/{questionId}/answers")`, `@PostMapping`)
+  - 상세 페이지에 답변 개수, 답변 목록, 답변 등록 폼 추가
+  - `AnswerControllerTest`: 등록 후 리다이렉트, 없는 질문 404
+- 이유
+  - **(개선) URL `POST /questions/{id}/answers`**: 교재 `POST /answer/create/{id}`는 동사(create)가 들어가고 답변이 어느 질문에 속하는지 URL에 드러나지 않음. 답변은 질문의 하위 자원이고 POST가 이미 "생성"이라는 뜻 (14163 37강, 14168 26강)
+  - **(개선) `answerRepository.save()` 대신 `question.addAnswer()`**: 트랜잭션 안에서 영속 상태인 질문에 답변을 추가하면 cascade PERSIST로 커밋 시점에 INSERT됨 (14163 37강 강사 커스터마이징)
+  - **(개선) 트랜잭션은 서비스에**: 강사는 컨트롤러에 `@Transactional`을 붙였지만, 트랜잭션 경계를 서비스로 모아 컨트롤러는 요청/응답만 담당하게
+  - **PRG(Post-Redirect-Get)**: 등록 후 화면을 바로 그리지 않고 리다이렉트 → 새로고침해도 POST가 다시 전송되지 않음
+- 결과
+  - 브라우저에서 1번 질문에 답변 등록 → `/questions/1`로 리다이렉트되고 "1개의 답변이 있습니다." 표시
+  - `./gradlew test` 19건 통과
