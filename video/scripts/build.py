@@ -15,6 +15,7 @@
 사용법 (video 폴더에서):
   .venv/Scripts/python scripts/build.py            # 음성 생성 + 루트 생성
   .venv/Scripts/python scripts/build.py --no-tts   # 기존 음성으로 루트만 다시 생성
+  .venv/Scripts/python scripts/build.py --only=00-intro   # 이 장만 음성 생성
 """
 import asyncio
 import hashlib
@@ -119,14 +120,16 @@ def esc(text: str) -> str:
     return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
-def build(no_tts: bool) -> None:
+def build(no_tts: bool, only: set[str]) -> None:
     BUILD.mkdir(exist_ok=True)
     timeline, t = [], 0.0
     for slug, title in CHAPTERS:
         txt = NARRATION / f"{slug}.txt"
         cues_file = BUILD / f"{slug}.cues.json"
         lines = read_lines(txt) if txt.exists() else []
-        if lines and not no_tts:
+        # --only 로 고른 장만 음성을 만든다. 나머지는 이미 만든 음성을 쓰거나, 아직 없으면 임시 길이로 둔다.
+        make_tts = not no_tts and (not only or slug in only)
+        if lines and make_tts:
             cues = synthesize(slug, lines)
             cues_file.write_text(json.dumps(cues, ensure_ascii=False, indent=1), encoding="utf-8")
         elif cues_file.exists() and lines:
@@ -156,15 +159,16 @@ def write_index(timeline: list[dict], total: float) -> None:
             f'      <div id="{cid}-host" data-composition-id="{cid}" data-composition-src="compositions/{c["slug"]}.html"'
             f' data-start="{c["start"]}" data-duration="{c["duration"]}" data-track-index="0"></div>')
         if c["audio"]:
+            audio_len = round(duration_of(AUDIO / f"{c['slug']}.mp3"), 3)  # 슬롯 = 실제 음성 길이
             audios.append(
                 f'      <audio id="vo-{cid}" class="clip" src="audio/{c["slug"]}.mp3" data-start="{c["start"]}"'
-                f' data-duration="{c["duration"]}" data-track-index="2" data-volume="1"></audio>')
+                f' data-duration="{audio_len}" data-track-index="2" data-volume="1"></audio>')
         for j, cue in enumerate(c["cues"]):
             s = round(c["start"] + cue["start"], 3)
             d = round(cue["end"] - cue["start"] + 0.25, 3)
             captions.append(
-                f'      <div class="clip caption" data-start="{s}" data-duration="{d}" data-track-index="3"'
-                f' data-layout-ignore><span>{esc(cue["text"])}</span></div>')
+                f'      <div id="cap-{cid}-{j:02d}" class="clip caption" data-start="{s}" data-duration="{d}"'
+                f' data-track-index="3" data-layout-ignore><span>{esc(cue["text"])}</span></div>')
     bgm = ""
     if (ROOT / "audio" / "bgm.mp3").exists():
         bgm = (f'      <audio id="bgm" class="clip" src="audio/bgm.mp3" data-start="0" data-duration="{total}"'
@@ -210,4 +214,6 @@ def write_chapters(timeline: list[dict]) -> None:
 
 
 if __name__ == "__main__":
-    build(no_tts="--no-tts" in sys.argv)
+    # 예) build.py --only 00-intro,01-project
+    only_arg = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--only=")), "")
+    build(no_tts="--no-tts" in sys.argv, only={s for s in only_arg.split(",") if s})

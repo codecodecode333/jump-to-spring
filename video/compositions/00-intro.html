@@ -1,22 +1,118 @@
 <!doctype html>
 <html lang="ko">
   <body>
-    <!-- 인트로: 장면은 이 div 안에 작성. id 는 다른 장과 겹치지 않게 ch00- 로 시작 -->
+    <!-- 인트로: 제목(0초부터, 썸네일) → 완성 화면 미리보기 → 7가지 개선 예고 → 4단계 진행 방식 -->
     <div id="ch00" class="chapter" data-composition-id="ch00" data-width="1920" data-height="1080">
-      <div class="stage center">
-        <div id="ch00-kicker" class="kicker">인트로</div>
-        <div id="ch00-hero" class="hero">책대로 만들고, 이렇게 고쳤다</div>
+      <style>
+        #ch00 .layer { position: absolute; inset: 0; padding: 90px 140px 190px; display: flex; flex-direction: column; justify-content: center; }
+        #ch00-title { align-items: center; text-align: center; }
+        #ch00-title .hero { font-size: 104px; }
+        #ch00-title .sub { margin-top: 30px; font-size: 40px; }
+
+        /* 완성 화면: 브라우저 창 모양 */
+        #ch00-shots { position: absolute; inset: 0; }
+        #ch00 .window { position: absolute; width: 1120px; background: #fff; border-radius: 16px; overflow: hidden;
+          box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55); border: 1px solid #475569; }
+        #ch00 .window .bar { height: 44px; background: #e2e8f0; display: flex; align-items: center; gap: 10px; padding: 0 18px; }
+        #ch00 .window .dot { width: 14px; height: 14px; border-radius: 50%; background: #94a3b8; }
+        #ch00 .window .url { margin-left: 16px; font-family: var(--font-code); font-size: 20px; color: #475569; }
+        #ch00 .window img { display: block; width: 100%; }
+        #ch00-win-list { left: 150px; top: 150px; }
+        #ch00-win-detail { left: 650px; top: 300px; }
+
+        /* 7가지 */
+        #ch00-seven .items { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; }
+        #ch00-seven .item { background: var(--panel); border: 2px solid var(--line); border-radius: 22px; padding: 30px 34px; }
+        #ch00-seven .item .n { color: var(--spring); font-size: 30px; font-weight: 800; }
+        #ch00-seven .item .t { font-size: 46px; font-weight: 800; margin-top: 6px; }
+
+        /* 4단계 */
+        #ch00-steps { align-items: center; text-align: center; }
+        #ch00-steps .row { display: flex; align-items: center; gap: 22px; margin-top: 20px; }
+        #ch00-steps .step { font-size: 44px; padding: 18px 36px; margin: 0; }
+        #ch00-steps .arrow { font-size: 44px; color: var(--muted); }
+
+        /* 처음엔 제목만 보이도록 나머지는 CSS 로 숨겨 둔다 (0초 프레임에도 적용되게) */
+        #ch00-shots, #ch00-seven, #ch00-steps { opacity: 0; }
+        #ch00 .window { opacity: 0; transform: translateY(80px); }
+        #ch00-seven .item { opacity: 0; transform: translateY(30px); }
+      </style>
+
+      <!-- 1) 제목: 0초부터 보이게 (첫 프레임이 유튜브 썸네일 후보) -->
+      <div id="ch00-title" class="layer" data-hold>
+        <div class="kicker">점프 투 스프링부트 · 복습 프로젝트</div>
+        <div class="hero">책대로 만들고,<br /><em>이렇게 고쳤습니다</em></div>
+        <div class="sub">Spring Boot 4 리팩터링 7가지</div>
       </div>
+
+      <!-- 2) 완성 화면 미리보기 (개발 서버 캡처) -->
+      <div id="ch00-shots" data-hold>
+        <div id="ch00-win-list" class="window">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url" data-layout-ignore>localhost/questions</span></div>
+          <img src="assets/screens/app-list.png" alt="질문 목록" />
+        </div>
+        <div id="ch00-win-detail" class="window">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url" data-layout-ignore>localhost/questions/2</span></div>
+          <img src="assets/screens/app-detail.png" alt="질문 상세" />
+        </div>
+      </div>
+
+      <!-- 3) 오늘의 7가지 -->
+      <div id="ch00-seven" class="layer" data-hold>
+        <div class="kicker">오늘 살펴볼 개선</div>
+        <div class="title">일곱 가지</div>
+        <div class="items">
+          <div class="item"><div class="n">01</div><div class="t">URL 설계</div></div>
+          <div class="item"><div class="n">02</div><div class="t">엔티티 설계</div></div>
+          <div class="item"><div class="n">03</div><div class="t">N+1 문제</div></div>
+          <div class="item"><div class="n">04</div><div class="t">보안</div></div>
+          <div class="item"><div class="n">05</div><div class="t">테스트</div></div>
+          <div class="item"><div class="n">06</div><div class="t">폼과 사용성</div></div>
+          <div class="item"><div class="n">07</div><div class="t">패키지 구조</div></div>
+        </div>
+      </div>
+
+      <!-- 4) 각 장의 진행 순서 -->
+      <div id="ch00-steps" class="layer">
+        <div class="kicker">각 장은 이 순서로</div>
+        <div class="row">
+          <span class="step book">① 교재 방식</span><span class="arrow">→</span>
+          <span class="step problem">② 문제점</span><span class="arrow">→</span>
+          <span class="step fix">③ 개선 코드</span><span class="arrow">→</span>
+          <span class="step proof">④ 결과 증명</span>
+        </div>
+      </div>
+
       <script>
         (() => {
           // build.py 가 내레이션 길이에 맞춰 채운다: CUES[i] = i번째 문장이 시작되는 시간(장 기준 초)
-          const CUES = /*CUES*/[]/*END*/;
-          const DUR = /*DUR*/4.0/*END*/;
+          const CUES = /*CUES*/[0.0, 4.91, 11.788, 15.906, 25.904]/*END*/;
+          const DUR = /*DUR*/34.264/*END*/;
           const at = (i, offset = 0) => (CUES[i] ?? 0) + offset;
+          const ease = "power3.out";
 
           const tl = gsap.timeline({ paused: true });
-          tl.from("#ch00-kicker", { opacity: 0, y: 30, duration: 0.5, ease: "power3.out" }, at(0, 0.1));
-          tl.from("#ch00-hero", { opacity: 0, y: 40, duration: 0.6, ease: "power3.out" }, at(0, 0.3));
+          // 문장 1: "책대로 게시판을 만들고..." → 제목이 빠지고 완성 화면 등장
+          tl.to("#ch00-title", { opacity: 0, y: -40, duration: 0.5, ease: "power2.in" }, at(1, 0.2));
+          tl.set("#ch00-shots", { opacity: 1 }, at(1, 0.6));
+          tl.to("#ch00-win-list", { y: 0, opacity: 1, duration: 0.8, ease }, at(1, 0.6));
+          tl.to("#ch00-win-detail", { y: 0, opacity: 1, duration: 0.8, ease }, at(1, 2.6));
+
+          // 문장 2: "일곱 가지를 보여 드립니다" → 화면이 빠지고 7가지 제목
+          tl.to("#ch00-shots", { opacity: 0, duration: 0.4 }, at(2, 0));
+          tl.set("#ch00-seven", { opacity: 1 }, at(2, 0.3));
+          tl.from(["#ch00-seven .kicker", "#ch00-seven .title"], { opacity: 0, y: 30, duration: 0.5, ease, stagger: 0.1 }, at(2, 0.3));
+
+          // 문장 3: 일곱 항목을 읽는 속도에 맞춰 하나씩 (문장 길이를 7등분)
+          const step3 = ((CUES[4] ?? DUR) - at(3) - 0.6) / 7;
+          tl.to("#ch00-seven .item", { opacity: 1, y: 0, duration: 0.45, ease, stagger: step3 }, at(3, 0.2));
+
+          // 문장 4: 진행 순서 네 단계
+          tl.to("#ch00-seven", { opacity: 0, duration: 0.4 }, at(4, 0));
+          tl.set("#ch00-steps", { opacity: 1 }, at(4, 0.3));
+          tl.from("#ch00-steps .kicker", { opacity: 0, y: 30, duration: 0.5, ease }, at(4, 0.3));
+          tl.from("#ch00-steps .row > *", { opacity: 0, x: -20, duration: 0.4, ease, stagger: 0.75 }, at(4, 0.6));
+
           window.__timelines = window.__timelines || {};
           window.__timelines["ch00"] = tl;
         })();
