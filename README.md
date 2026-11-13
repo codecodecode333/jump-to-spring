@@ -231,3 +231,14 @@
 - 결과
   - `/questions/1` → 200, `/questions/999` → 404
   - `./gradlew test` 17건 통과
+
+### [013] refactor(question): @RequestMapping으로 URL 프리픽스 공통화
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/013)
+- 출처: 교재 2-11, 14163 36강
+- 작업
+  - `QuestionController`에 `@RequestMapping("/questions")`, 메서드는 `@GetMapping`, `@GetMapping("/{id}")`
+- 이유
+  - 같은 컨트롤러의 URL이 모두 `/questions`로 시작하므로 한 곳에 모아 중복을 없애고, 프리픽스를 바꿀 때 한 줄만 고치면 되게
+  - 클래스 이름과 URL 프리픽스가 1:1로 대응되어 "이 URL은 어느 컨트롤러?"를 바로 찾을 수 있음
+- 결과
+  - URL 변화 없음, `./gradlew test` 17건 통과
