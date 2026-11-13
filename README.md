@@ -271,3 +271,18 @@
 - 결과
   - `/resource/style.css` → 200 `text/css`
   - 정적 파일은 빌드 결과물(`build/resources`)에서 제공되므로, 새 파일 추가 후에는 빌드(또는 IDE의 Build) 필요
+
+### [016] style(question): 부트스트랩(cdnjs)과 프리텐다드 폰트 적용
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/016)
+- 출처: 교재 2-14, 14163 39강
+- 작업
+  - Bootstrap 5.3.8 CSS를 cdnjs에서, Pretendard 폰트를 jsDelivr에서 불러옴
+  - 목록: `table` + 번호(`loop.count`) + 날짜 포맷(`#temporals.format`), 상세: `card`로 질문/답변 표시, 폼에 `form-control`, `btn`
+- 이유
+  - **(개선) CDN 사용 (14163 39강)**: 교재는 `bootstrap.min.css`를 내려받아 `static`에 복사함 → 저장소에 남의 라이브러리 파일이 섞이고 버전 업그레이드 시 파일을 다시 받아야 함. CDN은 URL의 버전만 바꾸면 되고 브라우저 캐시도 공유됨
+  - **(개선) 프리텐다드 폰트 (14163 39강)**: 한글 가독성이 좋은 오픈 폰트. 가변(Variable) + 동적 서브셋 CSS 한 줄로, 실제 사용하는 글자만 내려받음
+  - `#temporals.format`: `LocalDateTime`의 `2026-11-13T14:18:45.960484` 같은 기본 출력을 `yyyy-MM-dd HH:mm`으로
+  - `loop.count`: `th:each`의 상태 변수로 1부터 세는 번호 (DB id와는 다름)
+- 결과
+  - 목록/상세 화면에 부트스트랩 스타일 적용 확인 (스크린샷)
+  - `./gradlew test` 19건 통과
