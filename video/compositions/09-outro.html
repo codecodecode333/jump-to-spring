@@ -1,22 +1,84 @@
 <!doctype html>
 <html lang="ko">
   <body>
-    <!-- 마무리: 장면은 이 div 안에 작성. id 는 다른 장과 겹치지 않게 ch09- 로 시작 -->
+    <!-- 마무리: 7줄 요약(문장에 맞춰 등장) → 다음 편 예고(교재 3-14 도전과제) → 끝 화면 -->
     <div id="ch09" class="chapter" data-composition-id="ch09" data-width="1920" data-height="1080">
-      <div class="stage center">
-        <div id="ch09-kicker" class="kicker">마무리</div>
-        <div id="ch09-hero" class="hero">7가지 개선 요약</div>
+      <style>
+        #ch09 .layer { position: absolute; inset: 0; padding: 70px 140px 190px; display: flex; flex-direction: column; justify-content: center; opacity: 0; }
+        #ch09 .layer.first { opacity: 1; }
+        #ch09 .sum { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 30px; }
+        #ch09 .row { display: flex; gap: 20px; align-items: baseline; font-size: 36px; font-weight: 700; padding: 14px 22px;
+          background: var(--panel); border: 2px solid var(--line); border-radius: 16px; }
+        #ch09 .row .n { font-family: var(--font-code); color: var(--spring); font-size: 30px; }
+        #ch09 .row .r { color: var(--muted); font-weight: 600; font-size: 30px; margin-left: auto; }
+        #ch09 .chips { display: flex; flex-wrap: wrap; gap: 18px; }
+        #ch09 .chip { border: 2px solid var(--line); border-radius: 999px; padding: 14px 30px; font-size: 34px; color: var(--ink); }
+        #ch09 .end .hero { font-size: 120px; }
+        #ch09 .end .sub { margin-top: 30px; font-size: 38px; }
+      </style>
+
+      <!-- 1) 7줄 요약 -->
+      <div id="ch09-l0" class="layer first" data-hold>
+        <div class="kicker">정리</div>
+        <div class="title">책대로 만들고, 이렇게 고쳤다</div>
+        <div class="sum">
+          <div class="row"><span class="n">01</span>URL 설계<span class="r">자원 + HTTP 메서드</span></div>
+          <div class="row"><span class="n">02</span>엔티티 설계<span class="r">스스로 규칙을 지키게</span></div>
+          <div class="row"><span class="n">03</span>N+1 문제<span class="r">SQL 12번 → 3번</span></div>
+          <div class="row"><span class="n">04</span>보안<span class="r">구멍 3개 막음</span></div>
+          <div class="row"><span class="n">05</span>테스트<span class="r">57개 통과</span></div>
+          <div class="row"><span class="n">06</span>폼과 사용성<span class="r">바로 고칠 수 있게</span></div>
+          <div class="row"><span class="n">07</span>패키지 구조<span class="r">domain / global</span></div>
+        </div>
       </div>
+
+      <!-- 2) 다음 편: 교재 3-14 SBB 추가 기능(도전과제) -->
+      <div id="ch09-l1" class="layer" data-hold>
+        <div class="kicker">다음 편</div>
+        <div class="title">교재의 도전과제, 추가 기능 만들기</div>
+        <div class="chips">
+          <div class="chip">답변 페이징·정렬</div>
+          <div class="chip">댓글</div>
+          <div class="chip">카테고리</div>
+          <div class="chip">비밀번호 찾기·변경</div>
+          <div class="chip">프로필</div>
+          <div class="chip">최근 답변·댓글</div>
+          <div class="chip">조회 수</div>
+          <div class="chip">소셜 로그인</div>
+          <div class="chip">마크다운 에디터</div>
+        </div>
+      </div>
+
+      <!-- 3) 끝 화면 -->
+      <div id="ch09-l2" class="layer center end" data-hold>
+        <div class="hero">감사합니다</div>
+        <div class="sub">코드와 커밋별 작업내역은 설명란의 저장소에서</div>
+      </div>
+
       <script>
         (() => {
-          // build.py 가 내레이션 길이에 맞춰 채운다: CUES[i] = i번째 문장이 시작되는 시간(장 기준 초)
-          const CUES = /*CUES*/[]/*END*/;
-          const DUR = /*DUR*/4.0/*END*/;
+          const CUES = /*CUES*/[0.0, 7.454, 15.1, 22.314]/*END*/;
+          const DUR = /*DUR*/33.65/*END*/;
           const at = (i, offset = 0) => (CUES[i] ?? 0) + offset;
-
+          const ease = "power3.out";
           const tl = gsap.timeline({ paused: true });
-          tl.from("#ch09-kicker", { opacity: 0, y: 30, duration: 0.5, ease: "power3.out" }, at(0, 0.1));
-          tl.from("#ch09-hero", { opacity: 0, y: 40, duration: 0.6, ease: "power3.out" }, at(0, 0.3));
+          const swap = (from, to, t) => {
+            tl.to(`#ch09-l${from}`, { opacity: 0, duration: 0.35 }, t - 0.1);
+            tl.to(`#ch09-l${to}`, { opacity: 1, duration: 0.35 }, t + 0.15);
+          };
+
+          // 요약: 문장 0 에서 01~02, 문장 1 에서 03~07
+          tl.from("#ch09-l0 .row:nth-child(-n+2)", { opacity: 0, y: 20, duration: 0.4, ease, stagger: 2.2 }, at(0, 2.0));
+          tl.from("#ch09-l0 .row:nth-child(n+3)", { opacity: 0, y: 20, duration: 0.4, ease, stagger: 1.2 }, at(1, 0.3));
+
+          // 다음 편
+          swap(0, 1, at(2));
+          tl.from("#ch09-l1 .chip", { opacity: 0, y: 20, duration: 0.35, ease, stagger: 0.3 }, at(2, 0.6));
+
+          // 끝 화면
+          swap(1, 2, at(3));
+          tl.from("#ch09-l2 .hero", { opacity: 0, y: 30, duration: 0.6, ease }, at(3, 0.2));
+
           window.__timelines = window.__timelines || {};
           window.__timelines["ch09"] = tl;
         })();
