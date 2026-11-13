@@ -2,6 +2,8 @@ package com.mysite.sbb.global.initData;
 
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.repository.QuestionRepository;
+import com.mysite.sbb.domain.user.user.repository.UserRepository;
+import com.mysite.sbb.domain.user.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,13 +31,26 @@ public class BaseInitData {
     private BaseInitData self;
 
     private final QuestionRepository questionRepository;
+    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Bean
     ApplicationRunner baseInitDataApplicationRunner() {
         return args -> {
+            self.work0();
             self.work1();
             self.work2();
         };
+    }
+
+    // 개발용 회원 (비밀번호 1234)
+    @Transactional
+    public void work0() {
+        if (userRepository.count() > 0) return;
+
+        userService.create("admin", "admin@test.com", "1234");
+        userService.create("user1", "user1@test.com", "1234");
+        userService.create("user2", "user2@test.com", "1234");
     }
 
     @Transactional

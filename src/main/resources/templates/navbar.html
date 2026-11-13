@@ -1,5 +1,7 @@
 <!-- 모든 페이지 상단에 들어가는 내비게이션 바. layout.html 에서 th:replace 로 포함한다. -->
-<nav th:fragment="navbarFragment" class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+<!-- sec:authorize: 로그인 여부에 따라 보여줄 메뉴를 고른다 (thymeleaf-extras-springsecurity) -->
+<nav th:fragment="navbarFragment" class="navbar navbar-expand-lg navbar-light bg-light border-bottom"
+     xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <div class="container-fluid">
         <a class="navbar-brand" th:href="@{/}">SBB</a>
         <!-- 화면이 좁아지면 메뉴를 접고 햄버거 버튼으로 펼친다 (Bootstrap JS 의 collapse 기능) -->
@@ -9,11 +11,20 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">로그인</a>
+                <li class="nav-item" sec:authorize="isAnonymous()">
+                    <a class="nav-link" th:href="@{/users/login}">로그인</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" sec:authorize="isAnonymous()">
                     <a class="nav-link" th:href="@{/users/signup}">회원가입</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <span class="nav-link" sec:authentication="name"></span>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <!-- 로그아웃은 상태를 바꾸는 요청이므로 GET 링크가 아니라 CSRF 토큰을 포함한 POST 폼 -->
+                    <form th:action="@{/users/logout}" method="post" class="d-inline">
+                        <button type="submit" class="nav-link btn btn-link">로그아웃</button>
+                    </form>
                 </li>
             </ul>
         </div>

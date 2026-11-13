@@ -463,3 +463,22 @@
   - **(개선) URL `/users/signup`**: 다른 자원과 같이 복수형 프리픽스, 폼은 record (14168 40강)
 - 결과
   - `./gradlew test` 34건 통과
+
+### [028] feat(user): 로그인·로그아웃 (formLogin, UserDetailsService, POST 로그아웃)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/028)
+- 출처: 교재 3-07
+- 작업
+  - `UserSecurityService implements UserDetailsService`: 아이디로 회원을 찾아 `UserDetails`(권한 `ROLE_USER`/`ROLE_ADMIN`)로 반환
+  - `SecurityConfig`: `formLogin(loginPage("/users/login"))`, `logout(logoutUrl("/users/logout"))`
+  - `GET /users/login` 화면, 실패 시 `?error` 메시지
+  - `thymeleaf-extras-springsecurity6`: 내비게이션 바에서 `sec:authorize`로 로그인 전(로그인·회원가입) / 후(아이디·로그아웃) 메뉴 전환
+  - dev 초기 데이터에 회원 `admin`, `user1`, `user2` (비밀번호 `1234`)
+  - `UserLoginTest` 5건: 로그인 성공/실패, 로그인 후 메뉴, 로그아웃
+- 이유
+  - 로그인 처리(비밀번호 비교, 세션 저장)는 시큐리티 필터가 하고, 우리는 "회원 조회"와 "로그인 화면"만 제공하면 됨
+  - **(개선) 로그아웃을 POST + CSRF로**: 교재는 `GET /user/logout` 링크도 허용함 → 다른 사이트의 `<img src=".../logout">` 하나로 사용자를 강제 로그아웃시킬 수 있음. 상태를 바꾸는 요청은 POST 폼으로
+  - **(개선) 시큐리티 테스트 지원 활용**: `formLogin()`, `logout()`, `@WithMockUser`로 실제 로그인 흐름과 로그인 상태 화면을 테스트
+  - **(개선) 개발용 회원을 초기 데이터로**: 매번 회원가입하지 않고 바로 로그인해서 다음 기능(글쓴이, 수정/삭제)을 확인
+- 결과
+  - 브라우저에서 `user1` 로그인 → 홈(질문 목록)으로 이동, 상단에 `user1 | 로그아웃` 표시 (스크린샷)
+  - `./gradlew test` 39건 통과

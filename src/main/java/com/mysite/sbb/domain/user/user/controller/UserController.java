@@ -62,4 +62,10 @@ public class UserController {
         userService.create(form.username(), form.email(), form.password1());
         return "redirect:/";
     }
+
+    // 로그인 화면만 보여준다. 로그인 처리(POST)는 SecurityConfig 의 formLogin 이 담당
+    @GetMapping("/login")
+    public String showLogin() {
+        return "user/user/login";
+    }
 }
