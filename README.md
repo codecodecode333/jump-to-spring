@@ -5,8 +5,8 @@
 ## 기술 스택
 
 - Java 25, Spring Boot 4.1.2, Gradle 9.8.2 (Kotlin DSL)
-- Spring Web MVC, Spring Data JPA, H2, Lombok, DevTools
-- (예정) Thymeleaf, Spring Security
+- Spring Web MVC, Spring Data JPA, H2, Thymeleaf, Lombok, DevTools
+- (예정) Spring Security
 
 ## 참고 자료
 
@@ -172,3 +172,20 @@
   - 모든 패키지가 메인 클래스(`com.mysite.sbb`) 하위라서 컴포넌트 스캔에는 영향 없음
 - 결과
   - 동작 변화 없음, `./gradlew test` 14건 통과
+
+### [009] feat(question): 질문 목록 페이지 (GET /questions)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/009)
+- 출처: 교재 2-07, 14163 27~32강, 14168 3·18강
+- 작업
+  - Thymeleaf 의존성 추가 (`starter-thymeleaf`, `starter-thymeleaf-test`)
+  - `QuestionController.list()` → `Model`에 `questions` 담고 `question/question/list` 템플릿 렌더링
+  - dev 프로필: `thymeleaf.cache: false`, `thymeleaf.prefix: file:src/main/resources/templates/`
+  - `QuestionControllerTest`: `@SpringBootTest` + `@AutoConfigureMockMvc` 통합 테스트
+- 이유
+  - **(개선) URL `GET /questions`**: 교재 `/question/list`는 동사(list)가 URL에 들어감. 자원(questions)을 복수형 명사로 표현하고 행위는 HTTP 메서드로 구분 (14163 37강 "HTTP URL의 좋은 예와 나쁜 예")
+  - **(개선) 템플릿을 패키지 구조처럼 `question/question/list.html`에 배치 (14168)**: 템플릿이 늘어나도 도메인별로 찾기 쉬움
+  - **(개선) `prefix: file:...`**: 빌드된 결과물(`build/resources`)이 아닌 소스 폴더를 직접 읽어서, 템플릿 수정 후 새로고침만 하면 반영됨 (14168 18강)
+  - `Model`: 컨트롤러가 템플릿에 데이터를 넘기는 상자. 스프링이 액션 메서드 호출 시 자동으로 만들어 넣어 줌 (14163 28강)
+- 결과
+  - 브라우저 `/questions`에서 샘플 질문 2건의 제목·작성일시 표시
+  - `./gradlew test` 15건 통과
