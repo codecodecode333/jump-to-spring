@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -20,5 +21,13 @@ public class QuestionController {
         List<Question> questions = questionService.getList();
         model.addAttribute("questions", questions); // 템플릿에서 ${questions} 로 사용
         return "question/question/list"; // templates/question/question/list.html
+    }
+
+    // 교재: GET /question/detail/{id}, 개선: GET /questions/{id}
+    @GetMapping("/questions/{id}")
+    public String detail(@PathVariable Long id, Model model) { // URL 의 {id} 값을 매개변수로 받는다
+        Question question = questionService.getQuestion(id);
+        model.addAttribute("question", question);
+        return "question/question/detail";
     }
 }

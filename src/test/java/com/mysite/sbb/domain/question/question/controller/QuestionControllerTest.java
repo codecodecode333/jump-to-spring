@@ -42,4 +42,21 @@ class QuestionControllerTest {
                 .bodyText()
                 .contains("sbb가 무엇인가요?", "스프링부트 모델 질문입니다.");
     }
+
+    @Test
+    @DisplayName("GET /questions/{id}: 질문 상세")
+    void detail() {
+        assertThat(mvc.get().uri("/questions/{id}", q1.getId()))
+                .hasStatusOk()
+                .hasViewName("question/question/detail")
+                .bodyText()
+                .contains("sbb가 무엇인가요?", "sbb에 대해서 알고 싶습니다.");
+    }
+
+    @Test
+    @DisplayName("GET /questions/{id}: 없는 질문이면 404")
+    void detailNotFound() {
+        assertThat(mvc.get().uri("/questions/{id}", 999_999))
+                .hasStatus(404);
+    }
 }

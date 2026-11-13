@@ -214,3 +214,20 @@
   - **(개선) 클래스 레벨 `@Transactional(readOnly = true)`**: 교재 서비스에는 트랜잭션 설정이 없음. 조회는 읽기 전용(변경 감지 생략)으로, 쓰기 메서드에만 `@Transactional`을 따로 붙이는 방식
 - 결과
   - 동작 변화 없음, `./gradlew test` 15건 통과
+
+### [012] feat(question): 질문 상세 페이지 (GET /questions/{id}), 없는 질문은 404
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/012)
+- 출처: 교재 2-10, 14163 35강
+- 작업
+  - `QuestionService.getQuestion(id)`: 없으면 `DataNotFoundException`
+  - `global/exception/DataNotFoundException` (`@ResponseStatus(NOT_FOUND)`)
+  - `QuestionController.detail()` + `question/question/detail.html`, 목록 제목에 상세 링크 (`@{|/questions/${question.id}|}`)
+  - 테스트: 상세 200, 없는 id는 404
+- 이유
+  - **(개선) URL `GET /questions/{id}`**: 교재 `/question/detail/{id}` → "5번 질문"이라는 자원 자체를 주소로 표현
+  - **커스텀 예외**: 그냥 `get()`을 부르면 `NoSuchElementException` → 500(서버 잘못). 실제로는 "요청한 데이터가 없음"이므로 404가 맞고, 예외 이름만 보고도 상황을 알 수 있음 (14163 35강)
+  - **(개선) `orElseThrow`**: 교재의 `isPresent()` + `get()` 조합보다 짧고, `get()`을 실수로 먼저 부를 일이 없음
+  - Thymeleaf `@{|...|}`: `@{}`는 URL(컨텍스트 경로 자동 처리), `|...|`는 문자열 안에 변수를 끼워 넣는 리터럴 치환 (14163 35강)
+- 결과
+  - `/questions/1` → 200, `/questions/999` → 404
+  - `./gradlew test` 17건 통과
