@@ -1,22 +1,79 @@
 <!doctype html>
 <html lang="ko">
   <body>
-    <!-- 07 · 패키지 구조: 장면은 이 div 안에 작성. id 는 다른 장과 겹치지 않게 ch08- 로 시작 -->
+    <!-- 07 패키지 구조: 제목 → 교재 트리(실제 파일 목록) vs 개선 트리, 문장마다 해당 부분 강조 -->
     <div id="ch08" class="chapter" data-composition-id="ch08" data-width="1920" data-height="1080">
-      <div class="stage center">
-        <div id="ch08-kicker" class="kicker">07 · 패키지 구조</div>
-        <div id="ch08-hero" class="hero">domain / global</div>
+      <style>
+        #ch08 .layer { position: absolute; inset: 0; padding: 70px 120px 190px; display: flex; flex-direction: column; justify-content: center; opacity: 0; }
+        #ch08 .layer.first { opacity: 1; }
+        #ch08 .trees { display: grid; grid-template-columns: 540px minmax(0, 1fr); gap: 26px; }
+        #ch08 .label { font-size: 30px; font-weight: 800; margin: 0 0 10px 4px; }
+        #ch08 .tree { font-family: var(--font-code); font-size: 28px; line-height: 1.6; background: var(--panel); border: 2px solid var(--line);
+          border-radius: 20px; padding: 26px 32px; white-space: pre; }
+        #ch08 .tree .d { color: var(--spring); font-weight: 700; }
+        #ch08 .tree .c { color: var(--muted); }
+        #ch08 .tree .w { color: var(--warn); }
+        #ch08 .tree .row { border-radius: 8px; padding: 0 6px; margin: 0 -6px; }
+      </style>
+
+      <!-- 0) 제목 -->
+      <div id="ch08-l0" class="layer first center" data-hold>
+        <div class="kicker">07 · 패키지 구조</div>
+        <div class="hero">파일이 늘어도<br /><em>위치가 보이게</em></div>
       </div>
+
+      <!-- 1) 교재 vs 개선 (각 저장소의 실제 .java 파일 목록 기준) -->
+      <div id="ch08-l1" class="layer" data-hold>
+        <div class="trees">
+          <div id="ch08-book">
+            <div class="label" style="color: var(--before)">교재</div>
+            <div class="tree">com.mysite.sbb
+├─ <span class="w">question/</span>
+│    Question
+│    QuestionController
+│    QuestionForm
+│    QuestionRepository
+│    QuestionService
+├─ <span class="w">answer/</span>  Answer, …
+├─ <span class="w">user/</span>    SiteUser, …
+└─ CommonUtil,
+   SecurityConfig, …
+<span class="c">(한 폴더에 모든 종류가 섞임)</span></div>
+          </div>
+          <div id="ch08-ours">
+            <div class="label" style="color: var(--spring)">이 프로젝트</div>
+            <div class="tree">com.mysite.sbb
+├─ <span class="d">domain</span>
+<span id="ch08-q" class="row">│  ├─ question
+│  │  ├─ question/{controller, entity, repository, service}
+│  │  └─ answer/{controller, dto, entity, repository, service}</span>
+│  ├─ user/user/{controller, entity, repository, service}
+│  └─ home/home/controller
+<span id="ch08-g" class="row">└─ <span class="d">global</span>
+   ├─ jpa/{config, entity} · security · exception
+   └─ initData · markdown</span></div>
+          </div>
+        </div>
+      </div>
+
       <script>
         (() => {
-          // build.py 가 내레이션 길이에 맞춰 채운다: CUES[i] = i번째 문장이 시작되는 시간(장 기준 초)
-          const CUES = /*CUES*/[]/*END*/;
-          const DUR = /*DUR*/4.0/*END*/;
+          const CUES = /*CUES*/[0.0, 4.334, 9.388, 15.498, 20.696]/*END*/;
+          const DUR = /*DUR*/33.104/*END*/;
           const at = (i, offset = 0) => (CUES[i] ?? 0) + offset;
-
+          const ease = "power3.out";
           const tl = gsap.timeline({ paused: true });
-          tl.from("#ch08-kicker", { opacity: 0, y: 30, duration: 0.5, ease: "power3.out" }, at(0, 0.1));
-          tl.from("#ch08-hero", { opacity: 0, y: 40, duration: 0.6, ease: "power3.out" }, at(0, 0.3));
+
+          tl.from("#ch08-l0 .hero", { opacity: 0, y: 40, duration: 0.6, ease }, 0.2);
+          tl.to("#ch08-l0", { opacity: 0, duration: 0.35 }, at(1, -0.1));
+          tl.to("#ch08-l1", { opacity: 1, duration: 0.35 }, at(1, 0.15));
+          tl.from("#ch08-book", { opacity: 0, x: -24, duration: 0.5, ease }, at(1, 0.3));
+          tl.from("#ch08-ours", { opacity: 0, x: 24, duration: 0.5, ease }, at(2));
+          const hl = { backgroundColor: "rgba(109,179,63,0.16)", duration: 0.3 };
+          tl.to("#ch08-q", hl, at(3));
+          tl.to("#ch08-q", { backgroundColor: "rgba(0,0,0,0)", duration: 0.3 }, at(4));
+          tl.to("#ch08-g", hl, at(4));
+
           window.__timelines = window.__timelines || {};
           window.__timelines["ch08"] = tl;
         })();
