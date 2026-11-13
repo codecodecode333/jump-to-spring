@@ -1,22 +1,164 @@
 <!doctype html>
 <html lang="ko">
   <body>
-    <!-- 01 · URL 설계: 장면은 이 div 안에 작성. id 는 다른 장과 겹치지 않게 ch02- 로 시작 -->
+    <!-- 01 URL 설계: 제목 → ① 교재 URL ② 동사·GET 삭제 → ③ 개선 URL → ③ hiddenmethod → ③ global.js → ④ 실제 수정 결과 -->
     <div id="ch02" class="chapter" data-composition-id="ch02" data-width="1920" data-height="1080">
-      <div class="stage center">
-        <div id="ch02-kicker" class="kicker">01 · URL 설계</div>
-        <div id="ch02-hero" class="hero">URL은 자원, 행위는 HTTP 메서드</div>
+      <style>
+        #ch02 .layer { position: absolute; inset: 0; padding: 80px 140px 190px; display: flex; flex-direction: column; justify-content: center; opacity: 0; }
+        #ch02 .layer.first { opacity: 1; }
+        #ch02 .steps { display: flex; gap: 16px; margin-bottom: 8px; }
+        #ch02 .steps .step { margin-bottom: 0; }
+        #ch02 .urls { font-family: var(--font-code); font-size: 40px; line-height: 1.75; }
+        #ch02 .urls .m { display: inline-block; width: 150px; color: var(--muted); }
+        #ch02 .urls .verb { border-radius: 8px; padding: 0 6px; }
+        #ch02 .urls .row { border-radius: 12px; padding: 0 14px; }
+        #ch02 .note { margin-top: 26px; font-size: 32px; color: var(--before); font-weight: 700; opacity: 0; }
+
+        #ch02 .rows { display: flex; flex-direction: column; gap: 20px; }
+        #ch02 .row2 { display: grid; grid-template-columns: 1fr 80px 1fr; align-items: center; font-family: var(--font-code); font-size: 36px; }
+        #ch02 .row2 .b { color: var(--before); text-decoration: line-through; text-decoration-thickness: 3px; opacity: 0.85; }
+        #ch02 .row2 .arrow { color: var(--muted); text-align: center; font-family: var(--font-display); }
+        #ch02 .row2 .a { color: var(--spring); font-weight: 700; }
+
+        #ch02 .two-col { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 26px; align-items: start; }
+        #ch02 .label { font-size: 28px; color: var(--muted); margin: 0 0 12px 4px; font-weight: 700; }
+        #ch02 .codebox { font-size: 28px; padding: 24px 26px; }
+        #ch02 .flow { display: flex; align-items: center; gap: 18px; margin-top: 34px; font-size: 30px; }
+        #ch02 .flow .box { white-space: nowrap; font-size: 28px; background: var(--panel); border: 2px solid var(--line); border-radius: 16px; padding: 16px 24px; font-family: var(--font-code); }
+        #ch02 .flow .box.hl { border-color: var(--spring); color: var(--spring); }
+        #ch02 .flow .arrow { color: var(--muted); }
+        #ch02 .yaml { margin-bottom: 26px; }
+
+        #ch02 .window { width: 1300px; background: #fff; border-radius: 16px; overflow: hidden; border: 1px solid #475569;
+          box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55); position: relative; align-self: center; }
+        #ch02 .window .bar { height: 44px; background: #e2e8f0; display: flex; align-items: center; gap: 10px; padding: 0 18px; }
+        #ch02 .window .dot { width: 14px; height: 14px; border-radius: 50%; background: #94a3b8; }
+        #ch02 .window img { display: block; width: 100%; }
+        #ch02 .ring { position: absolute; border: 5px solid var(--spring); border-radius: 14px; opacity: 0; }
+      </style>
+
+      <!-- 0) 장 제목 -->
+      <div id="ch02-l0" class="layer first center" data-hold>
+        <div class="kicker">01 · URL 설계</div>
+        <div class="hero">URL은 자원,<br /><em>행위는 HTTP 메서드</em></div>
       </div>
+
+      <!-- 1) ① 교재 방식 / ② 문제점 (pahkey/sbb3 의 매핑) -->
+      <div id="ch02-l1" class="layer" data-hold>
+        <div class="steps"><span class="step book">① 교재 방식</span><span id="ch02-p" class="step problem" style="opacity:0">② 문제점</span></div>
+        <div class="title">교재의 주소</div>
+        <div class="urls">
+          <div class="row"><span class="m">GET</span>/question/<span class="verb">list</span></div>
+          <div class="row"><span class="m">GET</span>/question/<span class="verb">detail</span>/5</div>
+          <div class="row"><span class="m">POST</span>/answer/<span class="verb">create</span>/5</div>
+          <div class="row"><span class="m">POST</span>/question/<span class="verb">modify</span>/5</div>
+          <div id="ch02-del" class="row"><span class="m">GET</span>/question/<span class="verb">delete</span>/5</div>
+        </div>
+        <div id="ch02-note" class="note">삭제가 GET 링크 → 04 보안에서 다시</div>
+      </div>
+
+      <!-- 2) ③ 개선: 자원 + 메서드 -->
+      <div id="ch02-l2" class="layer" data-hold>
+        <div class="steps"><span class="step fix">③ 개선 코드</span></div>
+        <div class="title">주소는 자원, 행위는 메서드</div>
+        <div class="rows">
+          <div class="row2"><span class="b">GET /question/detail/5</span><span class="arrow">→</span><span class="a">GET /questions/5</span></div>
+          <div class="row2"><span class="b">POST /question/modify/5</span><span class="arrow">→</span><span class="a">PUT /questions/5</span></div>
+          <div class="row2"><span class="b">GET /question/delete/5</span><span class="arrow">→</span><span class="a">DELETE /questions/5</span></div>
+          <div class="row2"><span class="b">POST /answer/create/5</span><span class="arrow">→</span><span class="a">POST /questions/5/answers</span></div>
+        </div>
+      </div>
+
+      <!-- 3) ③ 개선: HTML 폼은 GET/POST 뿐 → hiddenmethod -->
+      <div id="ch02-l3" class="layer" data-hold>
+        <div class="steps"><span class="step fix">③ 개선 코드</span></div>
+        <div class="title" style="margin-bottom: 30px">HTML 폼은 GET과 POST뿐</div>
+        <div class="codebox yaml"><span class="c"># application.yaml</span>
+spring.mvc.<span class="k">hiddenmethod</span>.filter.enabled: <span class="s">true</span></div>
+        <div class="two-col">
+          <div><div class="label">modify.html (템플릿)</div><div class="codebox">&lt;form th:action="…"
+      <span class="hl">th:method="put"</span>&gt;</div></div>
+          <div><div class="label">브라우저가 받은 HTML (실제 렌더링)</div><div class="codebox">&lt;form action="/questions/306" <span class="a">method="post"</span>&gt;
+&lt;input type="hidden" name="_csrf" …/&gt;
+<span class="hl">&lt;input type="hidden" name="_method" value="put"/&gt;</span></div></div>
+        </div>
+        <div class="flow">
+          <span class="box">POST + _method=put</span><span class="arrow">→</span>
+          <span class="box">hiddenmethod 필터</span><span class="arrow">→</span>
+          <span class="box hl">PUT /questions/306</span><span class="arrow">→</span>
+          <span class="box hl">@PutMapping("/{id}")</span>
+        </div>
+      </div>
+
+      <!-- 4) ③ 개선: 링크는 global.js -->
+      <div id="ch02-l4" class="layer" data-hold>
+        <div class="steps"><span class="step fix">③ 개선 코드</span></div>
+        <div class="title">삭제 링크는 global.js가</div>
+        <div class="label">detail.html</div>
+        <div class="codebox" style="margin-bottom: 26px">&lt;a th:href="@{|/questions/${question.id}|}" <span class="hl">method="delete"</span>
+   data-confirm="정말로 삭제하시겠습니까?"&gt;삭제&lt;/a&gt;</div>
+        <div class="label">static/resource/global.js</div>
+        <div class="codebox">document.querySelectorAll(<span class="s">"a[method]"</span>).forEach((anchor) =&gt; {
+  <span class="c">// 클릭하면 숨은 폼을 만들어서</span>
+  form.method = <span class="s">"POST"</span>;
+  addHidden(form, <span class="s">"_method"</span>, method);  <span class="c">// DELETE</span>
+  form.submit();                            <span class="c">// + CSRF 토큰</span></div>
+      </div>
+
+      <!-- 5) ④ 결과: 개발 서버에서 실제로 PUT 수정 -->
+      <div id="ch02-l5" class="layer" data-hold>
+        <div class="steps"><span class="step proof">④ 결과 증명</span></div>
+        <div class="window">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+          <img src="assets/screens/url-modified.png" alt="PUT 으로 수정된 질문 상세" />
+          <div id="ch02-ring" class="ring" style="left: 1116px; top: 226px; width: 130px; height: 54px"></div>
+        </div>
+      </div>
+
       <script>
         (() => {
-          // build.py 가 내레이션 길이에 맞춰 채운다: CUES[i] = i번째 문장이 시작되는 시간(장 기준 초)
-          const CUES = /*CUES*/[]/*END*/;
-          const DUR = /*DUR*/4.0/*END*/;
+          const CUES = /*CUES*/[0.0, 4.166, 10.804, 17.682, 24.704, 30.286, 36.804, 42.698, 47.536, 51.606, 57.356, 62.362, 67.032, 72.182]/*END*/;
+          const DUR = /*DUR*/78.574/*END*/;
           const at = (i, offset = 0) => (CUES[i] ?? 0) + offset;
-
+          const ease = "power3.out";
           const tl = gsap.timeline({ paused: true });
-          tl.from("#ch02-kicker", { opacity: 0, y: 30, duration: 0.5, ease: "power3.out" }, at(0, 0.1));
-          tl.from("#ch02-hero", { opacity: 0, y: 40, duration: 0.6, ease: "power3.out" }, at(0, 0.3));
+          const swap = (from, to, t) => {
+            tl.to(`#ch02-l${from}`, { opacity: 0, duration: 0.35 }, t - 0.1);
+            tl.to(`#ch02-l${to}`, { opacity: 1, duration: 0.35 }, t + 0.15);
+          };
+
+          tl.from("#ch02-l0 .hero", { opacity: 0, y: 40, duration: 0.6, ease }, 0.2);
+
+          // ① 교재 방식
+          swap(0, 1, at(1));
+          tl.from("#ch02-l1 .urls .row", { opacity: 0, x: -20, duration: 0.4, ease, stagger: 0.35 }, at(1, 0.4));
+          // ② 문제점: 동사 강조
+          tl.to("#ch02-p", { opacity: 1, duration: 0.3 }, at(2));
+          tl.to("#ch02-l1 .verb", { backgroundColor: "rgba(251,191,36,0.25)", color: "#fbbf24", duration: 0.3, stagger: 0.25 }, at(2, 0.3));
+          // ② GET 삭제
+          tl.to("#ch02-del", { backgroundColor: "rgba(248,113,113,0.18)", duration: 0.3 }, at(3));
+          tl.to("#ch02-note", { opacity: 1, duration: 0.4 }, at(3, 0.4));
+
+          // ③ 개선 URL
+          swap(1, 2, at(4));
+          tl.from("#ch02-l2 .row2", { opacity: 0, y: 24, duration: 0.45, ease, stagger: 1.4 }, at(5, 0));
+
+          // ③ hiddenmethod
+          swap(2, 3, at(7));
+          tl.from("#ch02-l3 .yaml", { opacity: 0, y: 20, duration: 0.45, ease }, at(8));
+          tl.from("#ch02-l3 .two-col > *", { opacity: 0, y: 20, duration: 0.45, ease, stagger: 1.6 }, at(9));
+          tl.from("#ch02-l3 .flow > *", { opacity: 0, x: -14, duration: 0.3, ease, stagger: 0.45 }, at(10));
+
+          // ③ global.js
+          swap(3, 4, at(11));
+          tl.from("#ch02-l4 .codebox, #ch02-l4 .label", { opacity: 0, y: 20, duration: 0.45, ease, stagger: 0.8 }, at(11, 0.4));
+
+          // ④ 결과
+          swap(4, 5, at(13));
+          tl.from("#ch02-l5 .window", { opacity: 0, y: 40, duration: 0.6, ease }, at(13, 0.2));
+          tl.to("#ch02-ring", { opacity: 1, duration: 0.3, repeat: 3, yoyo: true }, at(13, 2.2));
+          tl.set("#ch02-ring", { opacity: 1 }, at(13, 3.6));
+
           window.__timelines = window.__timelines || {};
           window.__timelines["ch02"] = tl;
         })();

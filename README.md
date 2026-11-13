@@ -702,3 +702,18 @@
   - 장면 전환을 `for` 반복으로 문장 시작 시간에 맞춰, 대본 길이가 바뀌어도 자동으로 따라감
 - 결과
   - `hyperframes check` 통과, 스냅샷 6장으로 문장별 화면 확인
+
+### [042] feat(video): URL 설계 장 (음성 79초, 교재 URL → 개선 URL → hiddenmethod → global.js → 실제 PUT 결과)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/042)
+- 출처: 대본 [039] `02-url.txt`, README [012]·[014]·[030]·[031], 교재 저장소 매핑
+- 작업
+  - URL 장 내레이션 생성 (14문장, 78.6초)
+  - `compositions/02-url.html`: ① 교재 주소 5개 → ② 동사 강조·GET 삭제 경고 → ③ 개선 주소 표 → ③ `hiddenmethod` 설정·템플릿·**실제 렌더링 HTML**·요청 흐름 → ③ `global.js` → ④ 수정 결과 화면 (`modified at`에 강조 테두리)
+  - 증거 만들기: 개발 서버에 `user1`로 로그인 → 질문 작성 → 수정 폼 HTML 수집 → `_method=put`으로 수정 → 상세 화면 캡처(`assets/screens/url-modified.png`)
+- 이유
+  - "숨은 필드 `_method`가 만들어진다"를 설명만 하지 않고, 브라우저가 실제로 받은 HTML(`<input type="hidden" name="_method" value="put"/>`)을 그대로 보여 줌
+  - 결과 화면도 실제 PUT 요청으로 수정한 질문을 캡처 (꾸민 화면이 아님)
+  - 교재 주소는 교재 저장소의 `@GetMapping`/`@PostMapping` 값에서 가져옴
+  - 시연 과정에서 생긴 영문 테스트 질문(305번)은 개발 DB에서 삭제
+- 결과
+  - `hyperframes check` 통과, 스냅샷으로 코드 박스 넘침·강조 테두리 위치를 확인하고 수정
