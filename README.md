@@ -571,3 +571,18 @@
 - 결과
   - 브라우저: 2번 질문 추천 → "추천 1" 표시
   - `./gradlew test` 51건 통과
+
+### [034] feat(answer): 답변 작성·수정·추천 후 해당 답변 위치로 이동 (앵커)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/034)
+- 출처: 교재 3-11
+- 작업
+  - 상세의 답변마다 `<a th:id="|answer_${answer.id}|">` 앵커
+  - 답변 작성·수정·추천 후 `redirect:/questions/{qid}#answer_{id}` (`redirectToAnswer()`로 공통화)
+  - `AnswerService.create()`에서 `flush()`로 INSERT를 즉시 실행해 id 확보
+  - 테스트: 리다이렉트 URL에 `#answer_{id}` 포함
+- 이유
+  - 답변이 많은 질문에서 작업 후 페이지 맨 위로 돌아가면 방금 작업한 답변을 다시 찾아야 함 → URL의 `#id`로 브라우저가 해당 위치로 스크롤
+  - **cascade로 저장하면 id는 언제 생길까?**: INSERT는 flush(보통 트랜잭션 커밋) 때 실행되고, IDENTITY 전략은 INSERT 후에야 id를 알 수 있음. 앵커에 id가 바로 필요하므로 서비스에서 `flush()`. 테스트처럼 더 큰 트랜잭션 안에서 호출돼도 동작함 (처음엔 `#answer_null`로 테스트가 실패해서 발견)
+  - **(개선) 리다이렉트 URL 생성을 한 메서드로**: 교재는 컨트롤러 메서드마다 `String.format("redirect:/question/detail/%s#answer_%s", ...)`를 반복
+- 결과
+  - `./gradlew test` 51건 통과

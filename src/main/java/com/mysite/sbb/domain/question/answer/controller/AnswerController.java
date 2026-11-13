@@ -51,9 +51,15 @@ public class AnswerController {
             return "question/question/detail";
         }
 
-        answerService.create(questionId, form.content(), userService.getUser(principal.getName()));
+        Answer answer = answerService.create(questionId, form.content(), userService.getUser(principal.getName()));
         // 생성 후에는 화면을 바로 그리지 않고 상세 페이지로 리다이렉트 (PRG 패턴: 새로고침 시 중복 등록 방지)
-        return "redirect:/questions/" + questionId;
+        return redirectToAnswer(answer);
+    }
+
+    // 상세 페이지의 해당 답변 위치(#answer_3)로 이동 → 긴 페이지에서도 방금 작업한 답변이 바로 보인다
+    // (create 의 트랜잭션이 끝나며 INSERT 되었으므로 이 시점엔 answer.getId() 가 채워져 있다)
+    private String redirectToAnswer(Answer answer) {
+        return "redirect:/questions/%d#answer_%d".formatted(answer.getQuestion().getId(), answer.getId());
     }
 
     // 질문을 통해 답변을 찾고, 글쓴이가 아니면 403
@@ -99,7 +105,7 @@ public class AnswerController {
         }
 
         answerService.modify(answer, form.content());
-        return "redirect:/questions/" + questionId;
+        return redirectToAnswer(answer);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -124,6 +130,6 @@ public class AnswerController {
         Answer answer = questionService.getQuestion(questionId).findAnswerById(id)
                 .orElseThrow(() -> new DataNotFoundException("answer not found: " + id));
         answerService.vote(answer, userService.getUser(principal.getName()));
-        return "redirect:/questions/" + questionId;
+        return redirectToAnswer(answer);
     }
 }

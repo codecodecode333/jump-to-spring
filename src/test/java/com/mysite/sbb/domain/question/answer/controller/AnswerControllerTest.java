@@ -51,7 +51,7 @@ class AnswerControllerTest {
                 .with(csrf())
                 .param("content", "sbb는 질문답변 게시판입니다."))
                 .hasStatus3xxRedirection()
-                .hasRedirectedUrl("/questions/" + question.getId());
+                .redirectedUrl().matches("/questions/" + question.getId() + "#answer_\\d+"); // 새 답변 위치로
 
         assertThat(answerRepository.count()).isEqualTo(1);
         assertThat(answerRepository.findAll().get(0).getContent()).isEqualTo("sbb는 질문답변 게시판입니다.");
@@ -119,7 +119,7 @@ class AnswerControllerTest {
         assertThat(mvc.put().uri("/questions/{qid}/answers/{id}", question.getId(), answer.getId())
                 .with(csrf())
                 .param("content", "수정된 답변"))
-                .hasRedirectedUrl("/questions/" + question.getId());
+                .hasRedirectedUrl("/questions/" + question.getId() + "#answer_" + answer.getId());
 
         assertThat(answerRepository.findById(answer.getId()).orElseThrow().getContent()).isEqualTo("수정된 답변");
     }
@@ -162,7 +162,7 @@ class AnswerControllerTest {
 
         assertThat(mvc.post().uri("/questions/{qid}/answers/{id}/votes", question.getId(), answer.getId())
                 .with(csrf()))
-                .hasRedirectedUrl("/questions/" + question.getId());
+                .hasRedirectedUrl("/questions/" + question.getId() + "#answer_" + answer.getId());
 
         assertThat(answerRepository.findById(answer.getId()).orElseThrow().getVoters()).hasSize(1);
     }
