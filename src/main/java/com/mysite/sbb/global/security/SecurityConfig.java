@@ -2,6 +2,7 @@ package com.mysite.sbb.global.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,6 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
  * 의존성만 추가하면 모든 URL 이 로그인 필요로 바뀌므로, 일단 전부 허용하고 기능을 하나씩 붙여 나간다.
  */
 @Configuration
+@EnableMethodSecurity // 컨트롤러 메서드에 붙인 @PreAuthorize 를 동작시킨다
 public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) {

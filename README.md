@@ -482,3 +482,21 @@
 - 결과
   - 브라우저에서 `user1` 로그인 → 홈(질문 목록)으로 이동, 상단에 `user1 | 로그아웃` 표시 (스크린샷)
   - `./gradlew test` 39건 통과
+
+### [029] feat(question): 질문·답변에 글쓴이 추가, 글쓰기는 로그인 필요
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/029)
+- 출처: 교재 3-08
+- 작업
+  - `Question.author`, `Answer.author` (`@ManyToOne(fetch = LAZY)` → `SiteUser`), 생성자·`addAnswer()`에 author 인자
+  - `@EnableMethodSecurity` + 글쓰기 액션에 `@PreAuthorize("isAuthenticated()")`, `Principal`로 현재 사용자 조회
+  - `UserService.getUser(username)`, 목록에 글쓴이 칸, 상세에 글쓴이 표시 (`author?.username`)
+  - dev 초기 데이터에 글쓴이 지정
+  - 테스트: 클래스 레벨 `@WithMockUser("user1")`, 비로그인 시 로그인 페이지로 이동(`@WithAnonymousUser`), 저장된 글쓴이 확인
+- 이유
+  - 누가 쓴 글인지 알아야 다음 단계에서 "본인 글만 수정/삭제"를 구현할 수 있음
+  - 로그인하지 않은 사용자가 글쓰기 URL에 직접 접근하면 `@PreAuthorize`가 막고, 시큐리티가 로그인 페이지로 보냄
+  - **(개선) `author`도 LAZY**: 목록에서 글쓴이를 보여줄 때는 [024]의 `default_batch_fetch_size`가 작성자도 IN 절로 묶어서 조회
+  - `?.`(안전 탐색 연산자): 글쓴이 기능 이전에 만든 데이터는 `author`가 `null`이라 그냥 `.username`이면 오류
+  - 작성자와 무관한 테스트(리포지터리 등)는 `author`에 `null`을 넘김
+- 결과
+  - `./gradlew test` 42건 통과

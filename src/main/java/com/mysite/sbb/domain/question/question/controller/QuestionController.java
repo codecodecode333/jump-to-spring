@@ -3,11 +3,14 @@ package com.mysite.sbb.domain.question.question.controller;
 import com.mysite.sbb.domain.question.answer.dto.AnswerWriteForm;
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.service.QuestionService;
+import com.mysite.sbb.domain.user.user.entity.SiteUser;
+import com.mysite.sbb.domain.user.user.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,11 +21,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.security.Principal;
+
 @Controller
 @RequestMapping("/questions") // 이 컨트롤러의 모든 URL 앞에 /questions 가 붙는다
 @RequiredArgsConstructor // final 필드를 받는 생성자를 만들어 준다 → 생성자 주입
 public class QuestionController {
     private final QuestionService questionService; // 컨트롤러는 리포지터리 대신 서비스를 사용
+    private final UserService userService;
 
     // GET /questions (교재: GET /question/list)
     @GetMapping
@@ -63,20 +69,24 @@ public class QuestionController {
 
     // 같은 URL 이라도 GET 은 "폼 보여주기", POST 는 "폼 처리하기" (14168 26강)
     // @ModelAttribute("form"): 템플릿에서 ${form} 으로 쓸 수 있도록 모델에 담는다. (처음엔 빈 값)
+    @PreAuthorize("isAuthenticated()") // 로그인하지 않았으면 로그인 페이지로 보낸다
     @GetMapping("/write")
     public String showWrite(@ModelAttribute("form") WriteForm form) {
         return "question/question/write";
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/write")
     public String write(
             @ModelAttribute("form") @Valid WriteForm form, // @Valid: 위 검증 어노테이션을 실행
-            BindingResult bindingResult // 검증 결과. 이게 없으면 검증 실패 시 바로 400 예외가 난다
+            BindingResult bindingResult, // 검증 결과. 이게 없으면 검증 실패 시 바로 400 예외가 난다
+            Principal principal // 현재 로그인한 사용자 정보 (principal.getName() == username)
     ) {
         // 검증 실패 → 입력값과 오류를 가진 채로 폼을 다시 보여준다
         if (bindingResult.hasErrors()) return "question/question/write";
 
-        Question question = questionService.create(form.subject(), form.content());
+        SiteUser author = userService.getUser(principal.getName());
+        Question question = questionService.create(form.subject(), form.content(), author);
         return "redirect:/questions/" + question.getId(); // 방금 작성한 질문의 상세로 이동
     }
 }

@@ -2,6 +2,7 @@ package com.mysite.sbb.global.initData;
 
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.repository.QuestionRepository;
+import com.mysite.sbb.domain.user.user.entity.SiteUser;
 import com.mysite.sbb.domain.user.user.repository.UserRepository;
 import com.mysite.sbb.domain.user.user.service.UserService;
 
@@ -57,11 +58,14 @@ public class BaseInitData {
     public void work1() {
         if (questionRepository.count() > 0) return; // 파일 DB 라 재시작 시 중복 생성 방지
 
-        questionRepository.save(new Question("sbb가 무엇인가요?", "sbb에 대해서 알고 싶습니다."));
+        SiteUser user1 = userService.getUser("user1");
+        SiteUser user2 = userService.getUser("user2");
 
-        Question q2 = new Question("스프링부트 모델 질문입니다.", "id는 자동으로 생성되나요?");
-        q2.addAnswer("네 자동으로 생성됩니다.");
-        q2.addAnswer("맞습니다!");
+        questionRepository.save(new Question("sbb가 무엇인가요?", "sbb에 대해서 알고 싶습니다.", user1));
+
+        Question q2 = new Question("스프링부트 모델 질문입니다.", "id는 자동으로 생성되나요?", user2);
+        q2.addAnswer("네 자동으로 생성됩니다.", user1);
+        q2.addAnswer("맞습니다!", user2);
         questionRepository.save(q2);
     }
 
@@ -70,8 +74,9 @@ public class BaseInitData {
     public void work2() {
         if (questionRepository.count() >= 300) return;
 
+        SiteUser user1 = userService.getUser("user1");
         for (int i = 1; i <= 300; i++) {
-            questionRepository.save(new Question("테스트 데이터입니다:[%03d]".formatted(i), "내용무"));
+            questionRepository.save(new Question("테스트 데이터입니다:[%03d]".formatted(i), "내용무", user1));
         }
     }
 }

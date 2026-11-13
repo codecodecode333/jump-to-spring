@@ -2,6 +2,7 @@ package com.mysite.sbb.domain.question.question.service;
 
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.repository.QuestionRepository;
+import com.mysite.sbb.domain.user.user.entity.SiteUser;
 import com.mysite.sbb.global.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -39,7 +40,7 @@ public class QuestionService {
     }
 
     @Transactional // 쓰기 작업이므로 readOnly 가 아닌 트랜잭션
-    public Question create(String subject, String content) {
-        return questionRepository.save(new Question(subject, content));
+    public Question create(String subject, String content, SiteUser author) {
+        return questionRepository.save(new Question(subject, content, author));
     }
 }

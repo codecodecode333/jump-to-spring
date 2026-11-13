@@ -8,6 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import com.mysite.sbb.domain.user.user.service.UserService;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +22,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 @ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional // 각 테스트가 끝나면 롤백
+@Transactional
+@WithMockUser(username = "user1") // 기본적으로 user1 로 로그인한 상태로 요청 // 각 테스트가 끝나면 롤백
 class QuestionControllerTest {
     @Autowired
     private MockMvcTester mvc;
@@ -28,10 +32,14 @@ class QuestionControllerTest {
 
     private Question q1;
 
+    @Autowired
+    private UserService userService;
+
     @BeforeEach
     void setUp() {
-        q1 = questionRepository.save(new Question("sbb가 무엇인가요?", "sbb에 대해서 알고 싶습니다."));
-        questionRepository.save(new Question("스프링부트 모델 질문입니다.", "id는 자동으로 생성되나요?"));
+        userService.create("user1", "user1@test.com", "1234");
+        q1 = questionRepository.save(new Question("sbb가 무엇인가요?", "sbb에 대해서 알고 싶습니다.", null));
+        questionRepository.save(new Question("스프링부트 모델 질문입니다.", "id는 자동으로 생성되나요?", null));
     }
 
     @Test
@@ -115,7 +123,7 @@ class QuestionControllerTest {
     @Test
     @DisplayName("GET /questions?page=N: 한 페이지에 10개, 최신 글부터")
     void listPaging() {
-        for (int i = 1; i <= 23; i++) questionRepository.save(new Question("페이징 %02d".formatted(i), "내용"));
+        for (int i = 1; i <= 23; i++) questionRepository.save(new Question("페이징 %02d".formatted(i), "내용", null));
         // 총 25개 → 1페이지: 페이징 23 ~ 14, 3페이지: 나머지 5개
 
         assertThat(mvc.get().uri("/questions"))
@@ -134,10 +142,32 @@ class QuestionControllerTest {
     @Test
     @DisplayName("GET /questions: 번호는 전체 개수부터 거꾸로 매겨진다")
     void listNumbering() {
-        for (int i = 1; i <= 23; i++) questionRepository.save(new Question("페이징 %02d".formatted(i), "내용"));
+        for (int i = 1; i <= 23; i++) questionRepository.save(new Question("페이징 %02d".formatted(i), "내용", null));
         // 총 25개 → 1페이지 첫 번호 25, 2페이지 첫 번호 15
 
         assertThat(mvc.get().uri("/questions")).bodyText().containsPattern("<td>25</td>\\s*<td>\\s*<a[^>]*>페이징 23");
         assertThat(mvc.get().uri("/questions?page=2")).bodyText().containsPattern("<td>15</td>\\s*<td>\\s*<a[^>]*>페이징 13");
+    }
+
+    @Test
+    @WithAnonymousUser
+    @DisplayName("로그인하지 않으면 질문 등록 폼 대신 로그인 페이지로 보낸다")
+    void showWriteAnonymous() {
+        assertThat(mvc.get().uri("/questions/write"))
+                .hasStatus3xxRedirection()
+                .redirectedUrl().endsWith("/users/login");
+    }
+
+    @Test
+    @DisplayName("질문을 등록하면 로그인한 사용자가 글쓴이로 저장된다")
+    void writeSetsAuthor() {
+        assertThat(mvc.post().uri("/questions/write")
+                .with(csrf())
+                .param("subject", "글쓴이 확인")
+                .param("content", "내용"))
+                .hasStatus3xxRedirection();
+
+        Question saved = questionRepository.findBySubject("글쓴이 확인").orElseThrow();
+        assertThat(saved.getAuthor().getUsername()).isEqualTo("user1");
     }
 }

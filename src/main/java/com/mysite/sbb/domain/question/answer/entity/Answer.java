@@ -1,5 +1,6 @@
 package com.mysite.sbb.domain.question.answer.entity;
 
+import com.mysite.sbb.domain.user.user.entity.SiteUser;
 import com.mysite.sbb.global.jpa.entity.BaseEntity;
 import com.mysite.sbb.domain.question.question.entity.Question;
 
@@ -25,8 +26,12 @@ public class Answer extends BaseEntity {
     @ManyToOne(fetch = LAZY, optional = false)
     private Question question;
 
-    public Answer(Question question, String content) {
+    @ManyToOne(fetch = LAZY)
+    private SiteUser author;
+
+    public Answer(Question question, String content, SiteUser author) {
         this.question = question;
         this.content = content;
+        this.author = author;
     }
 }

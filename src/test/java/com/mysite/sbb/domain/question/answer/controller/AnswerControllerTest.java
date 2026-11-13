@@ -9,6 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import com.mysite.sbb.domain.user.user.service.UserService;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +23,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@WithMockUser(username = "user1") // 기본적으로 user1 로 로그인한 상태로 요청
 class AnswerControllerTest {
     @Autowired
     private MockMvcTester mvc;
@@ -30,9 +34,13 @@ class AnswerControllerTest {
 
     private Question question;
 
+    @Autowired
+    private UserService userService;
+
     @BeforeEach
     void setUp() {
-        question = questionRepository.save(new Question("sbb가 무엇인가요?", "sbb에 대해서 알고 싶습니다."));
+        userService.create("user1", "user1@test.com", "1234");
+        question = questionRepository.save(new Question("sbb가 무엇인가요?", "sbb에 대해서 알고 싶습니다.", null));
     }
 
     @Test
@@ -77,6 +85,19 @@ class AnswerControllerTest {
         assertThat(mvc.post().uri("/questions/{id}/answers", question.getId())
                 .param("content", "내용"))
                 .hasStatus(403);
+
+        assertThat(answerRepository.count()).isZero();
+    }
+
+    @Test
+    @WithAnonymousUser
+    @DisplayName("로그인하지 않으면 답변을 등록할 수 없다 (로그인 페이지로)")
+    void createAnonymous() {
+        assertThat(mvc.post().uri("/questions/{id}/answers", question.getId())
+                .with(csrf())
+                .param("content", "내용"))
+                .hasStatus3xxRedirection()
+                .redirectedUrl().endsWith("/users/login");
 
         assertThat(answerRepository.count()).isZero();
     }

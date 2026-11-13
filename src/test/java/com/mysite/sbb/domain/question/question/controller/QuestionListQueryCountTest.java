@@ -32,9 +32,9 @@ class QuestionListQueryCountTest {
     @DisplayName("목록에서 답변 개수를 보여줘도 질문 수만큼 답변 SELECT 가 반복되지 않는다 (N+1 방지)")
     void answerCountWithoutNPlusOne() {
         for (int i = 1; i <= 10; i++) {
-            Question q = new Question("질문 %02d".formatted(i), "내용");
-            q.addAnswer("답변 A");
-            q.addAnswer("답변 B");
+            Question q = new Question("질문 %02d".formatted(i), "내용", null);
+            q.addAnswer("답변 A", null);
+            q.addAnswer("답변 B", null);
             questionRepository.save(q);
         }
         em.flush();

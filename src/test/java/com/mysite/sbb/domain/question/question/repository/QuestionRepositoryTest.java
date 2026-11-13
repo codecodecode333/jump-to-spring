@@ -37,10 +37,10 @@ class QuestionRepositoryTest {
     // 테스트가 개발용 샘플 데이터에 의존하지 않도록, 각 테스트가 필요한 데이터를 직접 만든다.
     @BeforeEach
     void setUp() {
-        q1 = questionRepository.save(new Question("sbb가 무엇인가요?", "sbb에 대해서 알고 싶습니다."));
-        q2 = new Question("스프링부트 모델 질문입니다.", "id는 자동으로 생성되나요?");
-        q2.addAnswer("네 자동으로 생성됩니다.");
-        q2.addAnswer("맞습니다!");
+        q1 = questionRepository.save(new Question("sbb가 무엇인가요?", "sbb에 대해서 알고 싶습니다.", null));
+        q2 = new Question("스프링부트 모델 질문입니다.", "id는 자동으로 생성되나요?", null);
+        q2.addAnswer("네 자동으로 생성됩니다.", null);
+        q2.addAnswer("맞습니다!", null);
         questionRepository.save(q2);
     }
 
@@ -134,7 +134,7 @@ class QuestionRepositoryTest {
     void createAnswer() {
         Question question = questionRepository.findById(q1.getId()).orElseThrow();
 
-        Answer answer = question.addAnswer("sbb는 질문답변 게시판입니다.");
+        Answer answer = question.addAnswer("sbb는 질문답변 게시판입니다.", null);
         assertThat(answer.getId()).isNull(); // 아직 INSERT 전
 
         flushAndClear(); // flush 시 cascade PERSIST 로 INSERT
