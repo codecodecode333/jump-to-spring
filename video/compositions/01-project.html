@@ -1,22 +1,129 @@
 <!doctype html>
 <html lang="ko">
   <body>
-    <!-- 프로젝트 소개: 장면은 이 div 안에 작성. id 는 다른 장과 겹치지 않게 ch01- 로 시작 -->
+    <!-- 프로젝트 소개: 범위 → 강의 → 환경 → Boot 3 vs 4 → 숫자 → README 작업내역 (문장 하나에 화면 하나) -->
     <div id="ch01" class="chapter" data-composition-id="ch01" data-width="1920" data-height="1080">
-      <div class="stage center">
-        <div id="ch01-kicker" class="kicker">프로젝트 소개</div>
-        <div id="ch01-hero" class="hero">무엇을, 어떻게 만들었나</div>
+      <style>
+        #ch01 .layer { position: absolute; inset: 0; padding: 90px 140px 190px; display: flex; flex-direction: column; justify-content: center; opacity: 0; }
+        #ch01 .layer.first { opacity: 1; }
+        #ch01 .list { font-size: 32px; color: var(--muted); line-height: 1.7; margin-top: 10px; }
+        #ch01 .lecture .num { font-family: var(--font-code); color: var(--spring); font-size: 36px; font-weight: 700; }
+        #ch01 .lecture h3 { font-size: 46px; margin: 8px 0 10px; }
+        #ch01 .chips { display: flex; flex-wrap: wrap; gap: 22px; }
+        #ch01 .chip { border: 2px solid var(--line); border-radius: 999px; padding: 18px 38px; font-size: 40px; color: var(--muted); }
+        #ch01 .chip b { color: var(--ink); }
+        #ch01 .diff { display: grid; grid-template-columns: 220px 1fr 70px 1fr; gap: 18px 24px; align-items: center; font-size: 30px; }
+        #ch01 .diff .what { color: var(--muted); font-size: 30px; }
+        #ch01 .diff .b { font-family: var(--font-code); color: var(--before); }
+        #ch01 .diff .a { font-family: var(--font-code); color: var(--spring); font-weight: 700; }
+        #ch01 .diff .arrow { color: var(--muted); text-align: center; }
+        #ch01 .diff .head { font-size: 28px; color: var(--muted); letter-spacing: 0.06em; }
+        #ch01 .nums { display: flex; gap: 120px; justify-content: center; }
+        #ch01 .num-box { text-align: center; }
+        #ch01 .num-box .v { font-size: 220px; font-weight: 900; color: var(--spring); line-height: 1; letter-spacing: -0.04em; }
+        #ch01 .num-box .l { font-size: 44px; font-weight: 700; margin-top: 10px; }
+        #ch01 .md { background: #0d1117; border: 2px solid var(--line); border-radius: 20px; padding: 36px 46px; font-size: 28px; line-height: 1.65; color: #c9d1d9; }
+        #ch01 .md h4 { font-size: 36px; color: #f0f6fc; margin-bottom: 14px; border-bottom: 1px solid #30363d; padding-bottom: 12px; }
+        #ch01 .md .lbl { color: var(--spring); font-weight: 800; }
+        #ch01 .md code { font-family: var(--font-code); background: #161b22; padding: 2px 8px; border-radius: 6px; color: #e6edf3; }
+      </style>
+
+      <!-- 0) 범위 -->
+      <div id="ch01-l0" class="layer first" data-hold>
+        <div class="kicker">프로젝트 소개 · 범위</div>
+        <div class="title">교재 2장 컨트롤러부터 3장 검색까지</div>
+        <div class="grid two">
+          <div class="card"><h3>2장 · 기본기</h3><div class="list">컨트롤러 · JPA · 엔티티 · 리포지터리<br />목록 · 상세 · 답변 · 부트스트랩 · 질문 등록</div></div>
+          <div class="card"><h3>3장 · 서비스 개발</h3><div class="list">페이징 · 회원가입 · 로그인 · 글쓴이<br />수정·삭제 · 추천 · 앵커 · 마크다운 · 검색</div></div>
+        </div>
       </div>
+
+      <!-- 1) 참고 강의 -->
+      <div id="ch01-l1" class="layer" data-hold>
+        <div class="kicker">개선 아이디어</div>
+        <div class="title">장희성 강사님의 두 강의</div>
+        <div class="grid two">
+          <div class="card lecture"><div class="num">14163</div><h3>점프 투 스프링부트 개선</h3><p>39강 · 교재 2-02 ~ 2-14</p></div>
+          <div class="card lecture"><div class="num">14168</div><h3>JPA, 타임리프 개선</h3><p>46강 · 폼 검증, 레이아웃, 시큐리티</p></div>
+        </div>
+      </div>
+
+      <!-- 2) 환경 -->
+      <div id="ch01-l2" class="layer" data-hold>
+        <div class="kicker">개발 환경</div>
+        <div class="title">최신 버전으로</div>
+        <div class="chips">
+          <div class="chip">Spring Boot <b>4.1.2</b></div>
+          <div class="chip">Java <b>25</b></div>
+          <div class="chip">Gradle <b>9.8.2</b> · Kotlin DSL</div>
+          <div class="chip">JPA · H2 · Thymeleaf · Security</div>
+        </div>
+      </div>
+
+      <!-- 3) Boot 3 교재와 다른 점 (README [001] [003] [004]) -->
+      <div id="ch01-l3" class="layer" data-hold>
+        <div class="kicker">교재(Boot 3)대로 치면 막히는 곳</div>
+        <div class="title">Boot 4에서 바뀐 것</div>
+        <div class="diff">
+          <span class="head"></span><span class="head">교재 (Boot 3)</span><span></span><span class="head">이 프로젝트 (Boot 4)</span>
+          <span class="what">웹 스타터</span><span class="b">starter-web</span><span class="arrow">→</span><span class="a">starter-webmvc</span>
+          <span class="what">H2 콘솔</span><span class="b">기본 포함</span><span class="arrow">→</span><span class="a">spring-boot-h2console 추가</span>
+          <span class="what">@WebMvcTest</span><span class="b">…test.autoconfigure.web.servlet</span><span class="arrow">→</span><span class="a">…webmvc.test.autoconfigure</span>
+        </div>
+      </div>
+
+      <!-- 4) 숫자 -->
+      <div id="ch01-l4" class="layer" data-hold>
+        <div class="kicker">교재 구현까지</div>
+        <div class="nums">
+          <div class="num-box"><div id="ch01-commits" class="v">0</div><div class="l">커밋</div></div>
+          <div class="num-box"><div id="ch01-tests" class="v">0</div><div class="l">테스트</div></div>
+        </div>
+      </div>
+
+      <!-- 5) README 작업내역 실제 예시 ([024] 원문 일부) -->
+      <div id="ch01-l5" class="layer" data-hold>
+        <div class="kicker">커밋마다 README 작업내역</div>
+        <div class="md">
+          <h4>[024] feat(question): 목록에 답변 개수 표시, N+1 쿼리 문제 해결</h4>
+          <div><span class="lbl">작업</span> · <code>application.yaml</code>: <code>hibernate.default_batch_fetch_size: 100</code></div>
+          <div><span class="lbl">이유</span> · 질문 1번 + 개수 1번 + 답변 10번 = 12번 → IN 절로 모아서 조회 → 3번</div>
+          <div><span class="lbl">결과</span> · 설정을 지우고 테스트를 돌리면 <code>12L</code>로 실패, 설정이 있으면 3 이하로 통과</div>
+        </div>
+      </div>
+
       <script>
         (() => {
-          // build.py 가 내레이션 길이에 맞춰 채운다: CUES[i] = i번째 문장이 시작되는 시간(장 기준 초)
-          const CUES = /*CUES*/[]/*END*/;
-          const DUR = /*DUR*/4.0/*END*/;
+          const CUES = /*CUES*/[0.0, 5.246, 13.756, 19.77, 25.064, 31.102]/*END*/;
+          const DUR = /*DUR*/38.07/*END*/;
           const at = (i, offset = 0) => (CUES[i] ?? 0) + offset;
-
+          const ease = "power3.out";
           const tl = gsap.timeline({ paused: true });
-          tl.from("#ch01-kicker", { opacity: 0, y: 30, duration: 0.5, ease: "power3.out" }, at(0, 0.1));
-          tl.from("#ch01-hero", { opacity: 0, y: 40, duration: 0.6, ease: "power3.out" }, at(0, 0.3));
+
+          // 첫 화면 내용 등장
+          tl.from("#ch01-l0 .card", { opacity: 0, y: 40, duration: 0.6, ease, stagger: 0.4 }, at(0, 0.6));
+
+          // 문장 i 가 시작되면 화면 i 로 교체
+          for (let i = 1; i <= 5; i++) {
+            tl.to(`#ch01-l${i - 1}`, { opacity: 0, duration: 0.35 }, at(i, -0.1));
+            tl.to(`#ch01-l${i}`, { opacity: 1, duration: 0.35 }, at(i, 0.15));
+          }
+          tl.from("#ch01-l1 .card", { opacity: 0, y: 40, duration: 0.6, ease, stagger: 0.6 }, at(1, 0.3));
+          tl.from("#ch01-l2 .chip", { opacity: 0, y: 30, duration: 0.45, ease, stagger: 0.45 }, at(2, 0.3));
+          tl.from("#ch01-l3 .diff > *", { opacity: 0, duration: 0.3, stagger: 0.12 }, at(3, 0.3));
+
+          // 숫자 카운트업 (트윈 값으로 계산해서 어느 시점을 렌더해도 같은 값)
+          const n = { c: 0, t: 0 };
+          tl.to(n, {
+            c: 36, t: 57, duration: 1.8, ease: "power2.out",
+            onUpdate: () => {
+              document.getElementById("ch01-commits").textContent = Math.round(n.c);
+              document.getElementById("ch01-tests").textContent = Math.round(n.t);
+            },
+          }, at(4, 0.4));
+
+          tl.from("#ch01-l5 .md > *", { opacity: 0, y: 20, duration: 0.45, ease, stagger: 0.7 }, at(5, 0.3));
+
           window.__timelines = window.__timelines || {};
           window.__timelines["ch01"] = tl;
         })();
