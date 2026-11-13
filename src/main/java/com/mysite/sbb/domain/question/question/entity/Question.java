@@ -45,6 +45,11 @@ public class Question extends BaseEntity {
         this.author = author;
     }
 
+    // 이 질문의 글쓴이인가? (BaseEntity.equals: 같은 id 면 같은 회원)
+    public boolean isAuthor(SiteUser user) {
+        return author != null && author.equals(user);
+    }
+
     public void modify(String subject, String content) {
         this.subject = subject;
         this.content = content;

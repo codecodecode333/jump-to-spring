@@ -3,6 +3,10 @@ spring:
     name: sbb
   profiles:
     active: dev # 별도 지정이 없으면 dev 프로필로 실행
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true # <input name="_method" value="put"> 로 PUT/DELETE 요청을 흉내 (HTML 폼은 GET/POST 만 지원)
   output:
     ansi:
       enabled: always # 콘솔 로그 색상

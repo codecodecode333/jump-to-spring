@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,8 +19,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 
@@ -88,5 +91,52 @@ public class QuestionController {
         SiteUser author = userService.getUser(principal.getName());
         Question question = questionService.create(form.subject(), form.content(), author);
         return "redirect:/questions/" + question.getId(); // 방금 작성한 질문의 상세로 이동
+    }
+
+    // 본인 글이 아니면 403 (교재: 400 BAD_REQUEST → 개선: 권한 문제이므로 403 FORBIDDEN)
+    private Question getQuestionForAuthor(Long id, Principal principal) {
+        Question question = questionService.getQuestion(id);
+        if (!question.isAuthor(userService.getUser(principal.getName()))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
+        }
+        return question;
+    }
+
+    public record ModifyForm(
+            @NotBlank(message = "01-subject-제목은 필수항목입니다.")
+            @Size(max = 200, message = "02-subject-제목은 200자 이하로 입력해주세요.")
+            String subject,
+            @NotBlank(message = "03-content-내용은 필수항목입니다.")
+            String content
+    ) {
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{id}/modify")
+    public String showModify(@PathVariable Long id, Principal principal, Model model) {
+        Question question = getQuestionForAuthor(id, principal);
+        model.addAttribute("question", question);
+        model.addAttribute("form", new ModifyForm(question.getSubject(), question.getContent())); // 기존 값 채우기
+        return "question/question/modify";
+    }
+
+    // 교재: POST /question/modify/{id} → 개선: PUT /questions/{id} (수정 = PUT)
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/{id}")
+    public String modify(
+            @PathVariable Long id,
+            @ModelAttribute("form") @Valid ModifyForm form,
+            BindingResult bindingResult,
+            Principal principal,
+            Model model
+    ) {
+        Question question = getQuestionForAuthor(id, principal);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("question", question);
+            return "question/question/modify";
+        }
+
+        questionService.modify(question, form.subject(), form.content());
+        return "redirect:/questions/" + id;
     }
 }

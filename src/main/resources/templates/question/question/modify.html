@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="|${question.subject} 수정|"></title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <h5 class="my-3 border-bottom pb-2">질문수정</h5>
+    <!-- th:method="put" → method="post" + 숨은 필드 _method=put 을 만들어 준다 (hiddenmethod 필터가 PUT 으로 바꿈) -->
+    <form th:action="@{|/questions/${question.id}|}" th:method="put" th:object="${form}">
+        <div th:replace="~{form_errors :: formErrorsFragment}"></div>
+        <div class="mb-3">
+            <label for="subject" class="form-label">제목</label>
+            <input type="text" th:field="*{subject}" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="content" class="form-label">내용</label>
+            <textarea th:field="*{content}" class="form-control" rows="10"></textarea>
+        </div>
+        <input type="submit" value="수정하기" class="btn btn-primary my-2">
+        <a th:href="@{|/questions/${question.id}|}" class="btn btn-secondary my-2">취소</a>
+    </form>
+</div>
+</body>
+</html>

@@ -43,4 +43,9 @@ public class QuestionService {
     public Question create(String subject, String content, SiteUser author) {
         return questionRepository.save(new Question(subject, content, author));
     }
+
+    @Transactional
+    public void modify(Question question, String subject, String content) {
+        question.modify(subject, content); // 변경 감지로 트랜잭션 종료 시 UPDATE (save 호출 불필요)
+    }
 }

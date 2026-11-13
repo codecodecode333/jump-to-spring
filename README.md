@@ -500,3 +500,22 @@
   - 작성자와 무관한 테스트(리포지터리 등)는 `author`에 `null`을 넘김
 - 결과
   - `./gradlew test` 42건 통과
+
+### [030] feat(question): 질문 수정 (PUT /questions/{id}, 글쓴이만 가능)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/030)
+- 출처: 교재 3-09, 14168 32·41강
+- 작업
+  - `spring.mvc.hiddenmethod.filter.enabled: true`
+  - `GET /questions/{id}/modify` 수정 폼(기존 값 채움), `PUT /questions/{id}` 처리, `ModifyForm` record
+  - `Question.isAuthor(user)`, 글쓴이가 아니면 `403 FORBIDDEN`
+  - 상세: 글쓴이에게만 "수정" 버튼, 수정된 적 있으면 `modified at` 표시
+  - 테스트: 본인 글 수정 성공, 남의 글은 폼·수정 모두 403
+- 이유
+  - **(개선) `PUT` 메서드 사용 (14168 41강)**: 교재는 `POST /question/modify/{id}`. HTML 폼은 GET/POST만 되므로 `th:method="put"`이 숨은 필드 `_method=put`을 만들고, hiddenmethod 필터가 서버에서 PUT으로 바꿔 줌 → URL은 자원(`/questions/{id}`), 행위는 메서드로
+  - **(개선) 권한 없음은 403**: 교재는 `400 BAD_REQUEST`("수정권한이 없습니다"). 400은 "요청 형식이 잘못됨", 403은 "누군지는 알지만 권한이 없음"이라 의미가 맞음
+  - **(개선) 글쓴이 확인을 엔티티 메서드(`isAuthor`)로**: 교재는 컨트롤러에서 `getUsername().equals(...)` 문자열 비교. "글쓴이인가?"는 질문이 아는 규칙이므로 엔티티에 두고, 비교는 `BaseEntity.equals`(id 비교)
+  - **(개선) 수정일시는 `BaseEntity`의 `@LastModifiedDate`가 자동 기록**: 교재는 `modifyDate` 필드를 추가하고 직접 `LocalDateTime.now()`를 넣음
+  - 수정은 `save()` 없이 변경 감지로 UPDATE ([006]에서 확인한 Dirty Checking)
+- 결과
+  - 브라우저: `user1`로 질문 작성 → 수정 → 상세에 수정된 내용과 `modified at` 표시 (`_method=put` 숨은 필드 확인)
+  - `./gradlew test` 44건 통과

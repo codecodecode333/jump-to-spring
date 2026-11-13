@@ -170,4 +170,38 @@ class QuestionControllerTest {
         Question saved = questionRepository.findBySubject("글쓴이 확인").orElseThrow();
         assertThat(saved.getAuthor().getUsername()).isEqualTo("user1");
     }
+
+    @Test
+    @DisplayName("PUT /questions/{id}: 글쓴이는 질문을 수정할 수 있다")
+    void modify() {
+        Question mine = questionRepository.save(new Question("원래 제목", "원래 내용", userService.getUser("user1")));
+
+        assertThat(mvc.get().uri("/questions/{id}/modify", mine.getId()))
+                .hasStatusOk()
+                .bodyText().contains("value=\"원래 제목\"");
+
+        assertThat(mvc.put().uri("/questions/{id}", mine.getId())
+                .with(csrf())
+                .param("subject", "수정된 제목")
+                .param("content", "수정된 내용"))
+                .hasRedirectedUrl("/questions/" + mine.getId());
+
+        assertThat(questionRepository.findById(mine.getId()).orElseThrow().getSubject()).isEqualTo("수정된 제목");
+    }
+
+    @Test
+    @DisplayName("PUT /questions/{id}: 다른 사람의 질문은 수정할 수 없다 (403)")
+    void modifyForbidden() {
+        userService.create("user2", "user2@test.com", "1234");
+        Question others = questionRepository.save(new Question("남의 글", "내용", userService.getUser("user2")));
+
+        assertThat(mvc.get().uri("/questions/{id}/modify", others.getId())).hasStatus(403);
+        assertThat(mvc.put().uri("/questions/{id}", others.getId())
+                .with(csrf())
+                .param("subject", "몰래 수정")
+                .param("content", "내용"))
+                .hasStatus(403);
+
+        assertThat(questionRepository.findById(others.getId()).orElseThrow().getSubject()).isEqualTo("남의 글");
+    }
 }
