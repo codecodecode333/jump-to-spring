@@ -399,3 +399,19 @@
   - DB의 `id`를 번호로 쓰지 않는 이유: 글이 삭제되면 번호가 듬성듬성 비게 됨
 - 결과
   - `./gradlew test` 26건 통과
+
+### [024] feat(question): 목록에 답변 개수 표시, N+1 쿼리 문제 해결
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/024)
+- 출처: 교재 3-04
+- 작업
+  - 목록 제목 옆에 답변 개수 배지 (답변이 있을 때만)
+  - `application.yaml`: `hibernate.default_batch_fetch_size: 100`
+  - `QuestionListQueryCountTest`: Hibernate 통계로 목록 조회 시 실행된 SQL 개수 검증
+- 이유
+  - **(개선) N+1 문제**: 교재 코드 그대로면 목록의 질문 10개마다 `question.answers`를 꺼낼 때 답변 SELECT가 각각 실행됨 → 질문 1번 + 개수 1번 + 답변 10번 = **12번**
+  - `default_batch_fetch_size`를 설정하면 LAZY 컬렉션을 `WHERE question_id IN (?, ?, ...)`으로 한 번에 모아서 조회 → **3번**
+  - 설정 한 줄로 모든 LAZY 연관관계에 적용되고, 엔티티·쿼리 코드는 바꿀 필요 없음
+  - 테스트로 고정해 두면 나중에 실수로 N+1이 다시 생겼을 때 바로 알 수 있음
+- 결과
+  - 설정을 지우고 테스트를 돌리면 `12L`로 실패, 설정이 있으면 3 이하로 통과 (설정의 효과를 직접 확인)
+  - `./gradlew test` 27건 통과

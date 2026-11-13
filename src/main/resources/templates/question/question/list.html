@@ -21,6 +21,9 @@
             <td th:text="${paging.totalElements - (paging.number * paging.size) - loop.index}"></td>
             <td>
                 <a th:href="@{|/questions/${question.id}|}" th:text="${question.subject}"></a>
+                <!-- 답변이 있을 때만 개수 표시 -->
+                <span class="text-danger small ms-2" th:if="${#lists.size(question.answers) > 0}"
+                      th:text="${#lists.size(question.answers)}"></span>
             </td>
             <td th:text="${#temporals.format(question.createDate, 'yyyy-MM-dd HH:mm')}"></td>
         </tr>
