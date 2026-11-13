@@ -201,3 +201,16 @@
 - 결과
   - `GET /` → 302, `Location: /questions`
   - `./gradlew test` 15건 통과
+
+### [011] refactor(question): QuestionService 도입, 컨트롤러는 서비스를 통해 조회
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/011)
+- 출처: 교재 2-09, 14163 34강
+- 작업
+  - `QuestionService.getList()` 추가, `QuestionController`가 리포지터리 대신 서비스 사용
+  - 서비스 클래스에 `@Transactional(readOnly = true)`
+- 이유
+  - 역할 분리: 컨트롤러는 요청/응답, 서비스는 업무 로직, 리포지터리는 DB 접근
+  - 여러 컨트롤러가 같은 로직을 재사용할 수 있고, 나중에 엔티티 대신 DTO로 바꾸는 등의 변경을 서비스 한 곳에서 처리
+  - **(개선) 클래스 레벨 `@Transactional(readOnly = true)`**: 교재 서비스에는 트랜잭션 설정이 없음. 조회는 읽기 전용(변경 감지 생략)으로, 쓰기 메서드에만 `@Transactional`을 따로 붙이는 방식
+- 결과
+  - 동작 변화 없음, `./gradlew test` 15건 통과
