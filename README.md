@@ -621,3 +621,20 @@
 - 결과
   - 브라우저: `[29`로 검색 → `[290]`~`[299]` 10건, 검색창에 검색어 유지 (스크린샷)
   - `./gradlew test` 57건 통과
+
+### [037] docs(video): 교재 대비 개선점 소개 영상 (HyperFrames)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/037)
+- 출처: [001]~[036] 작업내역
+- 작업
+  - `video/`: HyperFrames(HTML → MP4) 프로젝트, `index.html` 한 파일에 9개 장면 (67초, 1920×1080, 30fps)
+  - 장면: 소개 → URL 설계 → 엔티티 설계 → N+1(12→3) → 보안 → 테스트 57건 → 폼·사용성 → 패키지 구조 → 마무리
+  - Pretendard 폰트를 로컬 파일(`assets/fonts`, SIL OFL)로 포함, CLI 버전 고정(`hyperframes@0.8.222`)
+  - 렌더 결과물(`renders/`)과 캐시(`.hyperframes/`)는 git에서 제외
+- 이유
+  - 교재와 비교해 무엇을, 왜 바꿨는지를 짧게 정리해 유튜브로 공유하기 위해
+  - 영상도 코드(HTML)라서 내용이 바뀌면 문구만 고쳐 다시 렌더링 가능
+  - 렌더러는 CDN 폰트를 보장하지 못해서(검사 단계 오류) 폰트를 파일로 포함
+  - 첫 프레임은 유튜브 썸네일로 쓰일 수 있어 제목이 0초부터 보이게 함
+- 결과
+  - `npm run check` 통과, `npm run render` → `renders/jump-to-spring-improvements.mp4` (H.264, 67초, 2.7MB)
+  - 다시 만들기: `cd video && npm run render`

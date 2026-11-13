@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="ko" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      /* 렌더러가 폰트를 확실히 쓰도록 로컬 파일로 선언 (Pretendard, SIL OFL 1.1) */
+      @font-face {
+        font-family: "Pretendard";
+        src: url("assets/fonts/PretendardVariable.woff2") format("woff2-variations");
+        font-weight: 45 920;
+      }
+      :root {
+        --ground: #0f172a;
+        --panel: #1e293b;
+        --line: #334155;
+        --ink: #f8fafc;
+        --muted: #94a3b8;
+        --spring: #6db33f;
+        --before: #f87171;
+        --font-display: "Pretendard", sans-serif;
+        --font-code: "Consolas", monospace;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--ground); }
+      #root { width: 100%; height: 100%; position: relative; font-family: var(--font-display); color: var(--ink); }
+
+      .scene { position: absolute; inset: 0; padding: 110px 140px; display: flex; flex-direction: column; justify-content: center; }
+      .kicker { color: var(--spring); font-size: 30px; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 18px; }
+      .title { font-size: 76px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 56px; }
+      .sub { font-size: 34px; color: var(--muted); line-height: 1.5; }
+      .code { font-family: var(--font-code); }
+
+      /* intro / outro */
+      .center { align-items: center; justify-content: center; text-align: center; }
+      .hero { font-size: 112px; font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; }
+      .hero em { font-style: normal; color: var(--spring); }
+      .chips { display: flex; gap: 22px; margin-top: 56px; justify-content: center; }
+      .chip { border: 2px solid var(--line); border-radius: 999px; padding: 14px 32px; font-size: 32px; color: var(--muted); }
+      .chip b { color: var(--ink); }
+
+      /* before / after rows */
+      .rows { display: flex; flex-direction: column; gap: 22px; }
+      .row { display: grid; grid-template-columns: 1fr 90px 1fr; align-items: center; font-size: 38px; }
+      .row .b { color: var(--before); text-decoration: line-through; text-decoration-thickness: 3px; opacity: 0.85; }
+      .row .arrow { color: var(--muted); text-align: center; }
+      .row .a { color: var(--spring); font-weight: 700; }
+      .head { font-size: 28px; color: var(--muted); letter-spacing: 0.08em; }
+      .head .a, .head .b { color: var(--muted); font-weight: 600; text-decoration: none; }
+
+      /* cards */
+      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+      .grid.two { grid-template-columns: repeat(2, 1fr); }
+      .card { background: var(--panel); border: 2px solid var(--line); border-radius: 24px; padding: 40px 44px; }
+      .card h3 { font-size: 40px; font-weight: 800; margin-bottom: 16px; }
+      .card p { font-size: 30px; color: var(--muted); line-height: 1.5; }
+      .card .code { font-size: 28px; color: var(--spring); }
+
+      /* N+1 bars */
+      .bars { display: flex; flex-direction: column; gap: 46px; margin-top: 10px; }
+      .bar-row { display: grid; grid-template-columns: 360px 1fr 160px; align-items: center; gap: 30px; font-size: 38px; }
+      .bar { height: 76px; border-radius: 14px; width: 0; }
+      .bar.before { background: var(--before); }
+      .bar.after { background: var(--spring); }
+      .bar-num { font-size: 64px; font-weight: 800; }
+      .note { margin-top: 64px; font-size: 34px; color: var(--muted); }
+      .note .code { color: var(--ink); background: var(--panel); padding: 6px 16px; border-radius: 10px; }
+
+      /* tests counter */
+      .big { font-size: 260px; font-weight: 900; color: var(--spring); line-height: 1; letter-spacing: -0.05em; }
+      .big-wrap { display: flex; align-items: flex-end; gap: 36px; margin-bottom: 50px; }
+      .big-unit { font-size: 64px; font-weight: 700; padding-bottom: 36px; }
+
+      /* tree */
+      .tree { font-family: var(--font-code); font-size: 38px; line-height: 1.6; background: var(--panel); border: 2px solid var(--line); border-radius: 24px; padding: 44px 56px; white-space: pre; }
+      .tree .d { color: var(--spring); }
+      .tree .c { color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="67" data-width="1920" data-height="1080">
+
+      <!-- 1. Intro 0-6 -->
+      <section id="s1" class="clip scene center" data-hold data-start="0" data-duration="6" data-track-index="0">
+        <div class="kicker">점프 투 스프링부트 복습 프로젝트</div>
+        <div class="hero">책대로 만들고,<br /><em>이렇게 개선했다</em></div>
+        <div class="chips">
+          <div class="chip">Spring Boot <b>4.1.2</b></div>
+          <div class="chip">Java <b>25</b></div>
+          <div class="chip">커밋 <b>36</b></div>
+          <div class="chip">테스트 <b>57</b></div>
+        </div>
+      </section>
+
+      <!-- 2. RESTful URL 6-14 -->
+      <section id="s2" class="clip scene" data-hold data-start="6" data-duration="8" data-track-index="0">
+        <div class="kicker">01 · URL 설계</div>
+        <div class="title">URL은 자원, 행위는 HTTP 메서드로</div>
+        <div class="rows code">
+          <div class="row head"><span class="b">교재</span><span class="arrow"></span><span class="a">개선</span></div>
+          <div class="row"><span class="b">GET /question/list</span><span class="arrow">→</span><span class="a">GET /questions</span></div>
+          <div class="row"><span class="b">GET /question/detail/5</span><span class="arrow">→</span><span class="a">GET /questions/5</span></div>
+          <div class="row"><span class="b">POST /answer/create/5</span><span class="arrow">→</span><span class="a">POST /questions/5/answers</span></div>
+          <div class="row"><span class="b">POST /question/modify/5</span><span class="arrow">→</span><span class="a">PUT /questions/5</span></div>
+          <div class="row"><span class="b">GET /question/delete/5</span><span class="arrow">→</span><span class="a">DELETE /questions/5</span></div>
+        </div>
+      </section>
+
+      <!-- 3. Entity 14-22 -->
+      <section id="s3" class="clip scene" data-hold data-start="14" data-duration="8" data-track-index="0">
+        <div class="kicker">02 · 엔티티 설계</div>
+        <div class="title">객체가 스스로 규칙을 지키게</div>
+        <div class="grid">
+          <div class="card"><h3>BaseEntity</h3><p>id · 생성일 · 수정일을 한 곳에, <span class="code">@CreatedDate</span>로 자동 기록</p></div>
+          <div class="card"><h3>Setter 제거</h3><p>생성자와 <span class="code">modify()</span>로만 상태 변경</p></div>
+          <div class="card"><h3>LAZY 로딩</h3><p>필요할 때만 조회해서 불필요한 조인 제거</p></div>
+          <div class="card"><h3>addAnswer()</h3><p>답변은 질문을 통해 생성, cascade로 저장</p></div>
+          <div class="card"><h3>orphanRemoval</h3><p>목록에서 빼면 DB에서도 삭제</p></div>
+          <div class="card"><h3>equals / hashCode</h3><p>프록시와 저장 전후에도 안전한 비교</p></div>
+        </div>
+      </section>
+
+      <!-- 4. N+1 22-30 -->
+      <section id="s4" class="clip scene" data-hold data-start="22" data-duration="8" data-track-index="0">
+        <div class="kicker">03 · 성능</div>
+        <div class="title">목록 한 페이지의 SQL, 12번 → 3번</div>
+        <div class="bars">
+          <div class="bar-row"><span>교재 그대로</span><div id="barBefore" class="bar before"></div><span class="bar-num" style="color: var(--before)">12</span></div>
+          <div class="bar-row"><span>batch fetch 적용</span><div id="barAfter" class="bar after"></div><span class="bar-num" style="color: var(--spring)">3</span></div>
+        </div>
+        <div class="note">설정 한 줄 <span class="code">default_batch_fetch_size: 100</span> · 쿼리 수는 테스트로 고정</div>
+      </section>
+
+      <!-- 5. Security 30-39 -->
+      <section id="s5" class="clip scene" data-hold data-start="30" data-duration="9" data-track-index="0">
+        <div class="kicker">04 · 보안</div>
+        <div class="title">교재 코드의 구멍을 막았다</div>
+        <div class="grid">
+          <div class="card"><h3>GET → POST + CSRF</h3><p>로그아웃 · 삭제 · 추천을 링크(GET)로 보내지 않음</p></div>
+          <div class="card"><h3>400 → 403</h3><p>권한 없음은 "형식 오류"가 아니라 "금지"</p></div>
+          <div class="card"><h3>XSS 차단</h3><p>마크다운 본문의 <span class="code">&lt;script&gt;</span>가 실행되지 않게 이스케이프</p></div>
+        </div>
+      </section>
+
+      <!-- 6. Tests 39-46 -->
+      <section id="s6" class="clip scene" data-hold data-start="39" data-duration="7" data-track-index="0">
+        <div class="kicker">05 · 테스트</div>
+        <div class="big-wrap"><span id="testCount" class="big">0</span><span class="big-unit">개의 테스트 통과</span></div>
+        <div class="sub"><span class="code">@DataJpaTest</span> · <span class="code">MockMvcTester</span> · <span class="code">@WithMockUser</span><br />각 테스트가 자기 데이터를 만들고 롤백 — 샘플 데이터에 의존하지 않음</div>
+      </section>
+
+      <!-- 7. Forms & UX 46-53 -->
+      <section id="s7" class="clip scene" data-hold data-start="46" data-duration="7" data-track-index="0">
+        <div class="kicker">06 · 폼과 사용성</div>
+        <div class="title">사용자가 바로 고칠 수 있게</div>
+        <div class="grid two">
+          <div class="card"><h3>record 폼 + 정렬된 오류</h3><p>첫 번째 오류 칸으로 자동 포커스</p></div>
+          <div class="card"><h3>중복은 항목별로</h3><p>"아이디가" 중복인지 "이메일이" 중복인지 알려줌</p></div>
+          <div class="card"><h3>페이지 번호 1부터</h3><p>교재는 <span class="code">?page=0</span>이 첫 페이지</p></div>
+          <div class="card"><h3>검색어는 URL에</h3><p>JS 없는 GET 폼, 결과 링크 공유 가능</p></div>
+        </div>
+      </section>
+
+      <!-- 8. Structure 53-59 -->
+      <section id="s8" class="clip scene" data-hold data-start="53" data-duration="9" data-track-index="0">
+        <div class="kicker">07 · 패키지 구조</div>
+        <div class="title">파일이 늘어도 위치가 보이게</div>
+        <div class="tree"><span class="d">com.mysite.sbb</span>
+├─ <span class="d">domain</span>
+│  ├─ question/question/<span class="c">{entity, repository, service, controller}</span>
+│  ├─ question/answer/<span class="c">{entity, repository, service, controller}</span>
+│  └─ user/user/<span class="c">{entity, repository, service, controller}</span>
+└─ <span class="d">global</span>  <span class="c">jpa · security · exception · initData · markdown</span></div>
+      </section>
+
+      <!-- 9. Outro 59-64 -->
+      <section id="s9" class="clip scene center" data-hold data-start="62" data-duration="5" data-track-index="0">
+        <div class="hero">jump-to-spring</div>
+        <div class="sub" style="margin-top: 40px">교재: 점프 투 스프링부트 · 개선 참고: 장희성 강사 14163 · 14168 강의</div>
+        <div class="chips"><div class="chip">커밋마다 <b>이유</b>와 <b>검증</b>을 README에 기록</div></div>
+      </section>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // 각 장면의 자식 요소를 순서대로 등장시키는 공통 함수
+      function enter(sel, at, stagger = 0.12) {
+        tl.from(sel, { opacity: 0, y: 36, duration: 0.6, ease: "power3.out", stagger }, at);
+      }
+
+      // 1. Intro: 제목은 0초부터 보이게 (첫 프레임이 썸네일로 쓰이므로), 숫자 칩만 등장
+      enter("#s1 .chip", 0.6, 0.15);
+
+      // 2. URL
+      enter("#s2 .kicker, #s2 .title", 6.2);
+      enter("#s2 .row", 6.9, 0.35);
+
+      // 3. Entity
+      enter("#s3 .kicker, #s3 .title", 14.2);
+      enter("#s3 .card", 14.9, 0.25);
+
+      // 4. N+1
+      enter("#s4 .kicker, #s4 .title", 22.2);
+      enter("#s4 .bar-row", 22.8, 0.2);
+      tl.to("#barBefore", { width: "100%", duration: 1.2, ease: "power2.out" }, 23.4);
+      tl.to("#barAfter", { width: "25%", duration: 0.8, ease: "power2.out" }, 25.0);
+      enter("#s4 .note", 26.2);
+
+      // 5. Security
+      enter("#s5 .kicker, #s5 .title", 30.2);
+      enter("#s5 .card", 31.0, 0.5);
+
+      // 6. Tests: 0 → 57 카운트업 (seek 해도 같은 값이 나오도록 트윈 값으로 계산)
+      enter("#s6 .kicker", 39.2);
+      enter("#s6 .big-wrap", 39.4);
+      const counter = { n: 0 };
+      tl.to(counter, {
+        n: 57, duration: 2.0, ease: "power2.out",
+        onUpdate: () => { document.getElementById("testCount").textContent = Math.round(counter.n); },
+      }, 39.6);
+      enter("#s6 .sub", 41.4);
+
+      // 7. Forms & UX
+      enter("#s7 .kicker, #s7 .title", 46.2);
+      enter("#s7 .card", 46.9, 0.3);
+
+      // 8. Structure
+      enter("#s8 .kicker, #s8 .title", 53.2);
+      enter("#s8 .tree", 53.8);
+
+      // 9. Outro
+      enter("#s9 .hero", 62.2);
+      enter("#s9 .sub, #s9 .chip", 62.8, 0.3);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
