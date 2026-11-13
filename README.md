@@ -638,3 +638,22 @@
 - 결과
   - `npm run check` 통과, `npm run render` → `renders/jump-to-spring-improvements.mp4` (H.264, 67초, 2.7MB)
   - 다시 만들기: `cd video && npm run render`
+
+### [038] chore(video): 설명 영상용 구조 개편 (장별 서브 컴포지션, edge-tts 내레이션·자막 빌드)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/038)
+- 출처: [037] 개선점 영상
+- 작업
+  - `video/compositions/00-intro.html` ~ `09-outro.html`: 장 10개를 서브 컴포지션으로 분리 (`data-composition-src`)
+  - `video/assets/theme.css`: 색·폰트·단계 배지(교재 방식/문제점/개선/결과)·코드 블록·터미널·자막 스타일 공통화
+  - `video/scripts/build.py`: `narration/*.txt` → edge-tts(`ko-KR-InJoonNeural`)로 줄마다 음성 생성 → 장 오디오 + 줄별 시간(cue) → 장 HTML에 시간 주입 → 루트 `index.html`과 유튜브 챕터 시간표(`build/chapters.txt`) 생성
+  - `requirements.txt`(edge-tts 7.3.1 고정), `npm run setup`, `npm run build`, 생성물(`audio/*.mp3`, `build/`, `.venv/`)은 git 제외
+- 이유
+  - 12분 영상을 한 파일에 쓰면 고치기 어려우므로 장 단위로 나눔 (HyperFrames 권장 구조)
+  - HyperFrames 내장 TTS(Kokoro)는 한국어가 없어서 edge-tts 사용
+  - **줄 단위로 음성을 만드는 이유**: 줄 하나가 곧 자막 한 줄이 되고, 줄마다 정확한 시작 시간을 알 수 있어 장면 애니메이션을 "몇 번째 문장이 나올 때"에 맞출 수 있음 (whisper 전사 없이도 자막 타이밍이 정확)
+  - 장 길이는 실제 음성 길이로 자동 결정 → 원고를 고치면 다시 빌드만 하면 됨
+  - 같은 문장은 캐시해서 다시 만들지 않음
+  - 장마다 스크립트를 `(() => { ... })()`로 감싼 이유: 여러 장이 한 페이지로 합쳐질 때 `const CUES` 같은 변수 이름이 충돌하지 않게
+- 결과
+  - 임시 원고 2줄로 시험: 음성 16.8초, 분당 약 321자, 자막이 문장별로 바뀌는 것을 스냅샷으로 확인 (임시 원고는 삭제)
+  - `hyperframes check` 통과 (빈 장 10개, 40초)

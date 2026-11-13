@@ -1,3 +1,6 @@
 node_modules/
 renders/
 .hyperframes/
+.venv/
+build/
+audio/*.mp3

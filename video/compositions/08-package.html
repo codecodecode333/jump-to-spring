@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ko">
+  <body>
+    <!-- 07 · 패키지 구조: 장면은 이 div 안에 작성. id 는 다른 장과 겹치지 않게 ch08- 로 시작 -->
+    <div id="ch08" class="chapter" data-composition-id="ch08" data-width="1920" data-height="1080">
+      <div class="stage center">
+        <div id="ch08-kicker" class="kicker">07 · 패키지 구조</div>
+        <div id="ch08-hero" class="hero">domain / global</div>
+      </div>
+      <script>
+        (() => {
+          // build.py 가 내레이션 길이에 맞춰 채운다: CUES[i] = i번째 문장이 시작되는 시간(장 기준 초)
+          const CUES = /*CUES*/[]/*END*/;
+          const DUR = /*DUR*/4.0/*END*/;
+          const at = (i, offset = 0) => (CUES[i] ?? 0) + offset;
+
+          const tl = gsap.timeline({ paused: true });
+          tl.from("#ch08-kicker", { opacity: 0, y: 30, duration: 0.5, ease: "power3.out" }, at(0, 0.1));
+          tl.from("#ch08-hero", { opacity: 0, y: 40, duration: 0.6, ease: "power3.out" }, at(0, 0.3));
+          window.__timelines = window.__timelines || {};
+          window.__timelines["ch08"] = tl;
+        })();
+      </script>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,70 @@
+/* 설명 영상 공통 테마. 루트 index.html 에서 한 번 로드하고, 모든 장(compositions/*.html)이 함께 쓴다. */
+
+/* 렌더러가 폰트를 확실히 쓰도록 로컬 파일로 선언 (Pretendard, SIL OFL 1.1) */
+@font-face {
+  font-family: "Pretendard";
+  src: url("fonts/PretendardVariable.woff2") format("woff2-variations");
+  font-weight: 45 920;
+}
+
+:root {
+  --ground: #0f172a;
+  --panel: #1e293b;
+  --line: #334155;
+  --ink: #f8fafc;
+  --muted: #94a3b8;
+  --spring: #6db33f;
+  --before: #f87171;
+  --warn: #fbbf24;
+  --font-display: "Pretendard", sans-serif;
+  --font-code: "Consolas", monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--ground); }
+#root { width: 100%; height: 100%; position: relative; font-family: var(--font-display); color: var(--ink); }
+
+/* 장 하나 = 화면 전체 */
+.chapter { position: absolute; inset: 0; font-family: var(--font-display); color: var(--ink); background: var(--ground); }
+.stage { position: absolute; inset: 0; padding: 100px 140px 190px; display: flex; flex-direction: column; justify-content: center; }
+.center { align-items: center; text-align: center; }
+
+.kicker { color: var(--spring); font-size: 30px; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 18px; }
+.title { font-size: 72px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 48px; }
+.hero { font-size: 112px; font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; }
+.hero em { font-style: normal; color: var(--spring); }
+.sub { font-size: 34px; color: var(--muted); line-height: 1.5; }
+.code { font-family: var(--font-code); }
+
+/* 단계 표시: ① 교재 방식 ② 문제점 ③ 개선 ④ 결과 */
+.step { display: inline-block; font-size: 28px; font-weight: 700; padding: 8px 22px; border-radius: 999px; margin-bottom: 24px; }
+.step.book { background: #3f1d24; color: var(--before); }
+.step.problem { background: #3a2f12; color: var(--warn); }
+.step.fix { background: #1d3320; color: var(--spring); }
+.step.proof { background: #1e2a44; color: #93c5fd; }
+
+/* 카드 / 패널 */
+.card { background: var(--panel); border: 2px solid var(--line); border-radius: 24px; padding: 36px 44px; }
+.card h3 { font-size: 40px; font-weight: 800; margin-bottom: 14px; }
+.card p { font-size: 30px; color: var(--muted); line-height: 1.5; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+.grid.two { grid-template-columns: repeat(2, 1fr); }
+
+/* 코드 블록 / 터미널 */
+.codebox { font-family: var(--font-code); font-size: 30px; line-height: 1.55; background: #0b1220; border: 2px solid var(--line);
+  border-radius: 20px; padding: 32px 40px; white-space: pre; color: #e2e8f0; }
+.codebox .k { color: #c084fc; }
+.codebox .a { color: #fbbf24; }
+.codebox .s { color: #86efac; }
+.codebox .c { color: #64748b; }
+.codebox .hl { background: rgba(109, 179, 63, 0.18); border-radius: 6px; }
+.codebox .bad { background: rgba(248, 113, 113, 0.18); border-radius: 6px; }
+.term { font-family: var(--font-code); font-size: 28px; line-height: 1.5; background: #020617; border: 2px solid var(--line);
+  border-radius: 20px; padding: 28px 36px; white-space: pre; color: #cbd5e1; }
+.term .ok { color: var(--spring); }
+.term .fail { color: var(--before); }
+
+/* 하단 자막 (루트에서 사용) */
+.caption { position: absolute; left: 0; right: 0; bottom: 56px; display: flex; justify-content: center; pointer-events: none; }
+.caption span { max-width: 1500px; background: rgba(2, 6, 23, 0.82); color: #f8fafc; font-family: var(--font-display);
+  font-size: 40px; font-weight: 600; line-height: 1.4; padding: 14px 32px; border-radius: 14px; text-align: center; }

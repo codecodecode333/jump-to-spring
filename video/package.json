@@ -3,6 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "setup": "python -m venv .venv && .venv/Scripts/python -m pip install -r requirements.txt",
+    "build": ".venv/Scripts/python scripts/build.py",
     "dev": "npx --yes hyperframes@0.8.222 preview",
     "check": "npx --yes hyperframes@0.8.222 check",
     "render": "npx --yes hyperframes@0.8.222 render",
