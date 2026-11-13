@@ -30,4 +30,9 @@ public class QuestionService {
         return questionRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("question not found: " + id));
     }
+
+    @Transactional // 쓰기 작업이므로 readOnly 가 아닌 트랜잭션
+    public Question create(String subject, String content) {
+        return questionRepository.save(new Question(subject, content));
+    }
 }

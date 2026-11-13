@@ -303,3 +303,18 @@
 - 결과
   - `/questions` → `<title>질문 목록 | SBB</title>`, `/questions/2` → `<title>스프링부트 모델 질문입니다. | SBB</title>`
   - `./gradlew test` 19건 통과
+
+### [018] feat(question): 질문 등록 폼과 저장 (GET·POST /questions/write)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/018)
+- 출처: 교재 2-16, 14168 3~7강·26강
+- 작업
+  - `QuestionService.create(subject, content)` (`@Transactional`)
+  - `GET /questions/write` 폼, `POST /questions/write` 저장 후 새 질문 상세로 리다이렉트
+  - 목록 하단에 "질문 등록하기" 버튼, `write.html`
+- 이유
+  - **(개선) 같은 URL + 다른 HTTP 메서드 (14168 26강)**: GET은 "폼 보여주기", POST는 "처리하기". `th:action`을 비워 두면 현재 URL로 전송되어 폼 주소를 따로 적지 않아도 됨 (14168 5강)
+  - 데이터를 바꾸는 요청은 반드시 POST (GET은 조회 전용, 주소창·로그·캐시에 남음, 14168 7강)
+  - **(개선) 저장 후 목록이 아니라 방금 쓴 질문의 상세로 이동**: 교재는 목록으로 이동. 작성 결과를 바로 확인할 수 있게
+- 결과
+  - 브라우저에서 질문 등록 → `/questions/3`으로 이동, 제목·내용 표시 (탭 제목 `테스트 질문입니다 | SBB`)
+  - `./gradlew test` 21건 통과

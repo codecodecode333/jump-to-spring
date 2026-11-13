@@ -59,4 +59,24 @@ class QuestionControllerTest {
         assertThat(mvc.get().uri("/questions/{id}", 999_999))
                 .hasStatus(404);
     }
+
+    @Test
+    @DisplayName("GET /questions/write: 질문 등록 폼")
+    void showWrite() {
+        assertThat(mvc.get().uri("/questions/write"))
+                .hasStatusOk()
+                .hasViewName("question/question/write");
+    }
+
+    @Test
+    @DisplayName("POST /questions/write: 질문 등록 후 상세로 리다이렉트")
+    void write() {
+        assertThat(mvc.post().uri("/questions/write")
+                .param("subject", "새 질문 제목")
+                .param("content", "새 질문 내용"))
+                .hasStatus3xxRedirection();
+
+        Question saved = questionRepository.findBySubject("새 질문 제목").orElseThrow();
+        assertThat(saved.getContent()).isEqualTo("새 질문 내용");
+    }
 }
