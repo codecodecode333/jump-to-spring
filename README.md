@@ -5,8 +5,7 @@
 ## 기술 스택
 
 - Java 25, Spring Boot 4.1.2, Gradle 9.8.2 (Kotlin DSL)
-- Spring Web MVC, Spring Data JPA, H2, Thymeleaf, Lombok, DevTools
-- (예정) Spring Security
+- Spring Web MVC, Spring Data JPA, H2, Thymeleaf(+Layout Dialect), Validation, Spring Security, Lombok, DevTools
 
 ## 참고 자료
 
@@ -415,3 +414,21 @@
 - 결과
   - 설정을 지우고 테스트를 돌리면 `12L`로 실패, 설정이 있으면 3 이하로 통과 (설정의 효과를 직접 확인)
   - `./gradlew test` 27건 통과
+
+### [025] chore(security): 스프링 시큐리티 도입 (모든 요청 허용, CSRF 적용)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/025)
+- 출처: 교재 3-05, 14168 46강
+- 작업
+  - `spring-boot-starter-security`, `spring-boot-starter-security-test`
+  - `global/security/SecurityConfig`: 정적 파일·H2 콘솔·나머지 모두 허용, H2 콘솔용 `frameOptions(sameOrigin)`와 CSRF 예외
+  - 테스트의 POST 요청에 `.with(csrf())`, `@WebMvcTest`에 `@Import(SecurityConfig.class)`
+  - CSRF 토큰 없는 POST는 403인지 검증하는 테스트 추가
+- 이유
+  - 회원가입·로그인 기능의 기반. 시큐리티는 컨트롤러보다 앞단의 필터에서 동작함 (14168 46강)
+  - 의존성만 넣으면 모든 페이지가 로그인 필요로 바뀌므로 일단 전부 허용 → 이후 단계에서 필요한 곳만 막음
+  - **CSRF**: 다른 사이트가 로그인한 사용자 몰래 우리 서버로 POST를 보내는 공격을 막기 위해, 우리 폼에만 있는 토큰을 함께 보내야 처리됨. `th:action`을 쓴 폼에는 Thymeleaf가 `_csrf` 숨은 필드를 자동으로 넣어 줌
+  - **(개선) 정적 파일 `/resource/**` 허용 한 줄**: [015]에서 정적 파일을 `static/resource`에 모아 둔 효과 (14168 46강)
+  - **(개선) `@WebMvcTest` + `@Import(SecurityConfig.class)`**: 웹 슬라이스 테스트는 일반 설정 클래스를 읽지 않아 기본 보안(모두 로그인 필요)이 적용되므로 우리 설정을 명시적으로 가져옴
+- 결과
+  - 목록·상세·H2 콘솔 정상, 상세 페이지 폼에 `_csrf` 숨은 필드 생성 확인
+  - `./gradlew test` 28건 통과

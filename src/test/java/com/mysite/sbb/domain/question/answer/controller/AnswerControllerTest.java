@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -38,6 +39,7 @@ class AnswerControllerTest {
     @DisplayName("POST /questions/{id}/answers: 답변 등록 후 질문 상세로 리다이렉트")
     void create() {
         assertThat(mvc.post().uri("/questions/{id}/answers", question.getId())
+                .with(csrf())
                 .param("content", "sbb는 질문답변 게시판입니다."))
                 .hasStatus3xxRedirection()
                 .hasRedirectedUrl("/questions/" + question.getId());
@@ -50,6 +52,7 @@ class AnswerControllerTest {
     @DisplayName("POST /questions/{id}/answers: 없는 질문이면 404")
     void createNotFound() {
         assertThat(mvc.post().uri("/questions/{id}/answers", 999_999)
+                .with(csrf())
                 .param("content", "내용"))
                 .hasStatus(404);
     }
@@ -58,11 +61,22 @@ class AnswerControllerTest {
     @DisplayName("POST /questions/{id}/answers: 내용이 비어 있으면 저장하지 않고 상세 화면에 오류를 보여준다")
     void createInvalid() {
         assertThat(mvc.post().uri("/questions/{id}/answers", question.getId())
+                .with(csrf())
                 .param("content", "  "))
                 .hasStatusOk()
                 .hasViewName("question/question/detail")
                 .bodyText()
                 .contains("답변 내용은 필수항목입니다.", "sbb가 무엇인가요?");
+
+        assertThat(answerRepository.count()).isZero();
+    }
+
+    @Test
+    @DisplayName("CSRF 토큰 없이 POST 하면 403 (다른 사이트가 사용자 몰래 요청을 보내는 공격 차단)")
+    void createWithoutCsrf() {
+        assertThat(mvc.post().uri("/questions/{id}/answers", question.getId())
+                .param("content", "내용"))
+                .hasStatus(403);
 
         assertThat(answerRepository.count()).isZero();
     }

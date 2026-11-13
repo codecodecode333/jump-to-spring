@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 // 컨트롤러 → 리포지터리 → DB → 템플릿까지 실제로 연결해서 확인하는 통합 테스트
 @ActiveProfiles("test")
@@ -73,6 +74,7 @@ class QuestionControllerTest {
     @DisplayName("POST /questions/write: 질문 등록 후 상세로 리다이렉트")
     void write() {
         assertThat(mvc.post().uri("/questions/write")
+                .with(csrf())
                 .param("subject", "새 질문 제목")
                 .param("content", "새 질문 내용"))
                 .hasStatus3xxRedirection();
@@ -87,6 +89,7 @@ class QuestionControllerTest {
         long before = questionRepository.count();
 
         assertThat(mvc.post().uri("/questions/write")
+                .with(csrf())
                 .param("subject", " ")
                 .param("content", ""))
                 .hasStatusOk()
@@ -101,6 +104,7 @@ class QuestionControllerTest {
     @DisplayName("POST /questions/write: 검증 실패 시 입력했던 값이 유지된다")
     void writeInvalidKeepsInput() {
         assertThat(mvc.post().uri("/questions/write")
+                .with(csrf())
                 .param("subject", "제목만 입력")
                 .param("content", ""))
                 .hasStatusOk()
