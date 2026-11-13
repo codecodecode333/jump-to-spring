@@ -778,3 +778,19 @@
 - 결과
   - 전체 테스트 57 tests, 0 failures, 테스트 실행 21.0초 (영상용 재실행)
   - `hyperframes check` 통과, 스냅샷 확인
+
+### [047] fix(global): 검증 오류 시 첫 오류 칸으로 포커스가 실제로 가지 않던 버그 수정
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/047)
+- 출처: [019] 오류 프래그먼트, 설명 영상 폼 장 준비 중 발견
+- 작업
+  - `form_errors.html`: 포커스 스크립트가 `DOMContentLoaded` 뒤에 입력칸을 찾고, 폼은 `document.currentScript.closest('form')`(스크립트를 감싼 폼)으로 찾음
+  - `write.html`, `signup.html`: `autofocus` → `th:autofocus="${!#fields.hasAnyErrors()}"` (오류가 있으면 autofocus를 붙이지 않음)
+  - 설명 주석은 타임리프 주석(`<!--/* */-->`)으로 써서 화면에 출력되지 않게
+  - 테스트: 처음 폼에는 `autofocus="autofocus"`가 있고, 오류가 있으면 없는지 검증 (회원가입, 질문 등록)
+- 이유 (버그 원인)
+  - 오류 프래그먼트는 폼 **맨 위**에 있어서, 스크립트가 실행되는 순간 아래쪽 입력칸은 아직 만들어지지 않았음 → `form[fieldName]`이 항상 `undefined` → 포커스를 한 번도 옮기지 못했음 ([019]의 `setTimeout`은 `focus()` 호출만 늦췄지, 입력칸을 찾는 것은 바로 실행됐음)
+  - 게다가 첫 칸(사용자ID·제목)의 `autofocus`가 포커스를 가져가려고 해서, 오류 칸 포커스와 다툼
+  - [019] 당시에는 브라우저 창에 포커스가 없어 동작을 확인하지 못하고 넘어갔음 → 영상에서 이 기능을 말하기 전에 실제로 확인하다가 발견
+- 결과
+  - 브라우저: 회원가입 오류(비밀번호 불일치·아이디 중복·이메일 중복) 후 포커스가 `password2`(첫 오류)로, 질문 등록(내용 누락) 후 `content`로 이동, 입력한 제목은 유지 (수정 전에는 `BODY`)
+  - `./gradlew test` 57건 통과

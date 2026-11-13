@@ -14,7 +14,7 @@
         <div class="mb-3">
             <label for="subject" class="form-label">제목</label>
             <!-- th:field: id, name, value 를 한 번에 만들어 준다 → 검증 실패 시 입력값 유지 -->
-            <input type="text" th:field="*{subject}" class="form-control" autofocus>
+            <input type="text" th:field="*{subject}" class="form-control" th:autofocus="${!#fields.hasAnyErrors()}"> <!--/* 오류가 있을 때는 autofocus 를 빼서 첫 오류 칸 포커스와 다투지 않게 (타임리프 주석: 화면에 출력 안 됨) */-->
         </div>
         <div class="mb-3">
             <label for="content" class="form-label">내용</label>

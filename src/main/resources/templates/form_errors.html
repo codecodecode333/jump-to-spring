@@ -10,12 +10,17 @@
         </ul>
     </div>
     <script>
-        // 이 프래그먼트를 포함한 폼(가장 최근에 그려진 폼)에서 첫 번째 오류 필드에 포커스
+        // 첫 번째 오류 필드에 포커스
+        // - 이 스크립트는 폼 맨 위에서 실행되므로, 아래쪽 입력칸은 아직 만들어지지 않았다.
+        //   → 페이지가 다 읽힌 뒤(DOMContentLoaded)에 입력칸을 찾는다. (예전 코드는 바로 찾아서 항상 실패했음)
+        // - 폼은 "이 스크립트를 감싼 폼"으로 찾는다. (내비게이션 바의 로그아웃 폼과 헷갈리지 않게)
         (() => {
-            const forms = document.querySelectorAll('form');
-            const form = forms[forms.length - 1];
-            const fieldName = form?.querySelector('[data-error-field-name]')?.dataset.errorFieldName;
-            if (fieldName && form[fieldName]) setTimeout(() => form[fieldName].focus());
+            const form = document.currentScript.closest('form');
+            document.addEventListener('DOMContentLoaded', () => {
+                const fieldName = form?.querySelector('[data-error-field-name]')?.dataset.errorFieldName;
+                const field = fieldName && form.elements[fieldName];
+                if (field) field.focus();
+            });
         })();
     </script>
 </th:block>

@@ -103,7 +103,8 @@ class QuestionControllerTest {
                 .hasStatusOk()
                 .hasViewName("question/question/write")
                 .bodyText()
-                .contains("제목은 필수항목입니다.", "내용은 필수항목입니다.");
+                .contains("제목은 필수항목입니다.", "내용은 필수항목입니다.")
+                .doesNotContain("autofocus=\"autofocus\"");
 
         assertThat(questionRepository.count()).isEqualTo(before);
     }

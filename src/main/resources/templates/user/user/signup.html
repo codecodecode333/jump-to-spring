@@ -14,7 +14,7 @@
         <div th:replace="~{form_errors :: formErrorsFragment}"></div>
         <div class="mb-3">
             <label for="username" class="form-label">사용자ID</label>
-            <input type="text" th:field="*{username}" class="form-control" autofocus>
+            <input type="text" th:field="*{username}" class="form-control" th:autofocus="${!#fields.hasAnyErrors()}"> <!--/* 오류가 있을 때는 autofocus 를 빼서 첫 오류 칸 포커스와 다투지 않게 (타임리프 주석: 화면에 출력 안 됨) */-->
         </div>
         <div class="mb-3">
             <label for="password1" class="form-label">비밀번호</label>

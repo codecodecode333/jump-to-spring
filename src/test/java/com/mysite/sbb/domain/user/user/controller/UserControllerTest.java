@@ -31,7 +31,8 @@ class UserControllerTest {
     void showSignup() {
         assertThat(mvc.get().uri("/users/signup"))
                 .hasStatusOk()
-                .hasViewName("user/user/signup");
+                .hasViewName("user/user/signup")
+                .bodyText().contains("autofocus=\"autofocus\""); // 처음엔 사용자ID 칸에 autofocus
     }
 
     @Test
@@ -75,6 +76,7 @@ class UserControllerTest {
                 .param("email", "user1@test.com"))
                 .hasStatusOk()
                 .bodyText()
-                .contains("이미 사용 중인 사용자ID입니다.", "이미 사용 중인 이메일입니다.");
+                .contains("이미 사용 중인 사용자ID입니다.", "이미 사용 중인 이메일입니다.")
+                .doesNotContain("autofocus=\"autofocus\""); // 오류가 있으면 autofocus 를 빼서 첫 오류 칸 포커스와 다투지 않게
     }
 }
