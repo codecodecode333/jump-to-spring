@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:db_test;MODE=MySQL # 메모리 DB: 테스트마다 깨끗한 상태에서 시작
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver

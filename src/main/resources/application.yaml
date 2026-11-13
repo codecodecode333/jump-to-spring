@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: sbb
+  profiles:
+    active: dev # 별도 지정이 없으면 dev 프로필로 실행
+  output:
+    ansi:
+      enabled: always # 콘솔 로그 색상
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update # 엔티티를 보고 테이블을 자동 생성/변경 (개발용)
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+        use_sql_comments: true
+logging:
+  level:
+    org.hibernate.orm.jdbc.bind: TRACE # SQL의 ? 에 바인딩되는 실제 값 출력
+    org.hibernate.orm.jdbc.extract: TRACE
+    org.springframework.transaction.interceptor: TRACE # 트랜잭션 시작/종료 출력

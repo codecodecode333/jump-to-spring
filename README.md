@@ -5,8 +5,8 @@
 ## 기술 스택
 
 - Java 25, Spring Boot 4.1.2, Gradle 9.8.2 (Kotlin DSL)
-- Spring Web MVC, Lombok, DevTools
-- (예정) Spring Data JPA, H2, Thymeleaf, Spring Security
+- Spring Web MVC, Spring Data JPA, H2, Lombok, DevTools
+- (예정) Thymeleaf, Spring Security
 
 ## 참고 자료
 
@@ -22,6 +22,8 @@
 ```
 
 브라우저에서 http://localhost:8080 접속 (포트 변경: `./gradlew bootRun --args=--server.port=8082`)
+
+- H2 콘솔: http://localhost:8080/h2-console (JDBC URL `jdbc:h2:./db_dev;MODE=MySQL`, 사용자 `sa`, 비밀번호 없음)
 
 ## 커밋 규칙
 
@@ -76,3 +78,22 @@
 - 결과
   - `/` → `SBB`, `/hello` → `안녕하세요 ^ ^` (둘 다 200, `text/plain;charset=UTF-8`, 한글 정상)
   - `./gradlew test` 3건 통과
+
+### [004] chore(db): JPA·H2 의존성 추가, yaml 설정과 dev/test 프로필 분리
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/004)
+- 출처: 교재 2-03, 14163 5~6강, 14168 최신 실습 환경
+- 작업
+  - 의존성: `spring-boot-starter-data-jpa`, `h2`(runtimeOnly), `spring-boot-h2console`, `spring-boot-starter-data-jpa-test`
+  - `application.properties` → `application.yaml` + `application-dev.yaml` / `application-test.yaml`
+  - dev: 파일 DB `jdbc:h2:./db_dev;MODE=MySQL`, test: 메모리 DB `jdbc:h2:mem:db_test;MODE=MySQL`
+  - SQL 로그(`show-sql`, `format_sql`, 바인딩 값 TRACE), 트랜잭션 로그 TRACE
+  - `SbbApplicationTests`에 `@ActiveProfiles("test")`, `.gitignore`에 `db_dev.*`
+- 이유
+  - **(개선) yaml**: 계층 구조라 `spring.jpa.hibernate.ddl-auto`처럼 긴 키의 중복이 사라지고 읽기 쉬움
+  - **(개선) 프로필 분리**: 개발 DB(파일, 데이터 유지)와 테스트 DB(메모리, 매번 초기화)를 나눠 테스트가 개발 데이터를 오염시키지 않게
+  - **(개선) `MODE=MySQL`**: 나중에 운영 DB를 MySQL로 바꿔도 SQL 문법 차이로 인한 문제를 줄이기 위해
+  - 교재(Boot 3)는 H2 콘솔이 내장이지만 Boot 4는 `spring-boot-h2console` 모듈을 따로 추가해야 함
+  - DB 파일은 각자 PC에서 생성되는 실행 결과물이므로 git에서 제외
+- 결과
+  - `./gradlew test` 3건 통과 (test 프로필로 메모리 DB 사용)
+  - `/h2-console` 접속 → JDBC URL이 설정값으로 자동 채워지고 Connect 성공

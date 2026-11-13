@@ -38,3 +38,6 @@ out/
 
 ### Claude Code (local tool config) ###
 .claude/
+
+### H2 dev database ###
+db_dev.*
