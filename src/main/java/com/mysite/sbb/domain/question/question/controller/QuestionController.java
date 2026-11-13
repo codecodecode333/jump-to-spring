@@ -1,5 +1,6 @@
 package com.mysite.sbb.domain.question.question.controller;
 
+import com.mysite.sbb.domain.question.answer.dto.AnswerWriteForm;
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.service.QuestionService;
 import jakarta.validation.Valid;
@@ -33,7 +34,11 @@ public class QuestionController {
 
     // GET /questions/{id} (교재: GET /question/detail/{id})
     @GetMapping("/{id}")
-    public String detail(@PathVariable Long id, Model model) { // URL 의 {id} 값을 매개변수로 받는다
+    public String detail(
+            @PathVariable Long id, // URL 의 {id} 값을 매개변수로 받는다
+            @ModelAttribute("answerForm") AnswerWriteForm answerForm, // 답변 작성 폼(빈 값)을 템플릿에 전달
+            Model model
+    ) {
         Question question = questionService.getQuestion(id);
         model.addAttribute("question", question);
         return "question/question/detail";

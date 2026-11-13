@@ -53,4 +53,17 @@ class AnswerControllerTest {
                 .param("content", "내용"))
                 .hasStatus(404);
     }
+
+    @Test
+    @DisplayName("POST /questions/{id}/answers: 내용이 비어 있으면 저장하지 않고 상세 화면에 오류를 보여준다")
+    void createInvalid() {
+        assertThat(mvc.post().uri("/questions/{id}/answers", question.getId())
+                .param("content", "  "))
+                .hasStatusOk()
+                .hasViewName("question/question/detail")
+                .bodyText()
+                .contains("답변 내용은 필수항목입니다.", "sbb가 무엇인가요?");
+
+        assertThat(answerRepository.count()).isZero();
+    }
 }

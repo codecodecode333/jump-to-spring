@@ -338,3 +338,18 @@
 - 결과
   - 제목만 입력하고 저장 → 같은 페이지에 "내용은 필수항목입니다." 표시, 제목 입력값 유지 (스크린샷)
   - `./gradlew test` 23건 통과
+
+### [020] feat(answer): 답변 등록 입력값 검증
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/020)
+- 출처: 교재 2-16, 14168 9~25강
+- 작업
+  - `AnswerWriteForm` record(`@NotBlank content`)를 `answer/dto`에 별도 파일로
+  - `AnswerController`: 검증 실패 시 질문을 다시 조회해 상세 화면을 오류와 함께 렌더링
+  - `QuestionController.detail()`에서 빈 `answerForm`을 모델에 담아 상세 폼이 `th:object`를 쓸 수 있게
+  - 테스트: 빈 답변은 저장 안 됨 + 상세 화면에 오류 표시
+- 이유
+  - 빈 답변 저장 방지 (질문 등록과 같은 방식으로 일관성 유지)
+  - `WriteForm`(질문)은 한 컨트롤러에서만 써서 내부 record로 뒀지만, 답변 폼은 **질문 상세(빈 폼 표시)와 답변 컨트롤러(처리) 두 곳**에서 쓰므로 별도 파일로 분리
+  - 실패 시 리다이렉트하면 오류와 입력값이 사라지므로, 상세 화면을 직접 다시 그림
+- 결과
+  - `./gradlew test` 24건 통과
