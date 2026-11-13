@@ -40,7 +40,8 @@ class QuestionControllerTest {
                 .hasStatusOk()
                 .hasViewName("question/question/list")
                 .bodyText()
-                .contains("sbb가 무엇인가요?", "스프링부트 모델 질문입니다.");
+                .contains("sbb가 무엇인가요?", "스프링부트 모델 질문입니다.")
+                .contains("navbar-brand"); // 레이아웃의 내비게이션 바 포함
     }
 
     @Test
