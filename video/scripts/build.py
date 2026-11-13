@@ -137,7 +137,10 @@ def build(no_tts: bool, only: set[str]) -> None:
         else:
             cues = []
         has_audio = bool(cues) and (AUDIO / f"{slug}.mp3").exists()
-        duration = round(cues[-1]["end"] + CHAPTER_TAIL, 3) if has_audio else PLACEHOLDER_SEC
+        # 원고에 "# tail=7" 처럼 쓰면 마지막 문장 뒤에 그만큼 화면을 더 보여 준다 (결과 화면을 읽을 시간)
+        m = re.search(r"^#\s*tail\s*=\s*([\d.]+)", txt.read_text(encoding="utf-8"), re.M) if txt.exists() else None
+        tail = float(m.group(1)) if m else CHAPTER_TAIL
+        duration = round(cues[-1]["end"] + tail, 3) if has_audio else PLACEHOLDER_SEC
         inject_cues(slug, cues, duration)
         timeline.append({"slug": slug, "title": title, "start": round(t, 3), "duration": duration,
                          "cues": cues, "audio": has_audio})

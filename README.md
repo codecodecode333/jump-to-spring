@@ -717,3 +717,18 @@
   - 시연 과정에서 생긴 영문 테스트 질문(305번)은 개발 DB에서 삭제
 - 결과
   - `hyperframes check` 통과, 스냅샷으로 코드 박스 넘침·강조 테두리 위치를 확인하고 수정
+
+### [043] feat(video): 엔티티 설계 장 (음성 93초, 교재 Setter·즉시 로딩 → 여섯 가지 개선 → 테스트 11개·실제 SQL)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/043)
+- 출처: 대본 [039] `03-entity.txt`, README [005]·[006]·[029]·[032], 교재 저장소 `Answer.java`·`AnswerService.java`
+- 작업
+  - 엔티티 장 내레이션 생성 (17문장, 93.4초 + 결과 화면 여유 8초)
+  - `compositions/03-entity.html`: ① 교재 `Answer`(`@Setter`, `@ManyToOne` 기본 즉시 로딩)와 `AnswerService.create`(setter 4번 + `save`) → ② 문제점 → ③ 여섯 가지 체크리스트, 말하는 항목마다 실제 코드로 교체 → ④ 리포지터리 테스트 11개 실제 실행 결과와 실제 SQL(cascade INSERT, 변경 감지 UPDATE, orphanRemoval DELETE)
+  - `build.py`: 원고의 `# tail=초`로 장 끝 여유 시간 지정
+- 이유
+  - 교재 코드는 교재 저장소 원문, 우리 코드는 실제 파일, 결과는 지금 실행한 `./gradlew test` 출력과 Hibernate SQL 로그에서 가져옴
+  - 마지막 결과 화면은 마지막 문장이 끝나면 바로 넘어가 읽을 시간이 부족했음 → 장별로 여유 시간을 줄 수 있게 함
+  - 체크리스트 컨테이너 클래스 이름 `.fix`가 테마의 `.step.fix` 배지와 겹쳐 배지가 늘어나는 문제를 스냅샷으로 발견해 `.fixgrid`로 변경
+- 결과
+  - `QuestionRepositoryTest` 11 tests, 0 failures (영상용으로 재실행)
+  - `hyperframes check` 통과, 스냅샷으로 장면 확인
