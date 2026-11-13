@@ -51,12 +51,15 @@ CHAPTERS = [
 ]
 
 
-def read_lines(path: Path) -> list[str]:
+def read_lines(path: Path) -> list[tuple[str, str]]:
+    """(자막, 읽을 말) 목록. "자막 || 읽을 말" 로 쓰면 둘을 다르게 할 수 있다.
+    예) `BaseEntity`로 공통 필드를 모읍니다. || 베이스 엔티티로 공통 필드를 모읍니다."""
     lines = []
     for raw in path.read_text(encoding="utf-8").splitlines():
         line = raw.strip()
         if line and not line.startswith("#"):
-            lines.append(line)
+            display, _, speech = line.partition("||")
+            lines.append((display.strip(), (speech or display).strip()))
     return lines
 
 
@@ -73,18 +76,18 @@ async def tts(text: str, out: Path) -> None:
     await edge_tts.Communicate(text, VOICE, rate=RATE).save(str(out))
 
 
-def synthesize(slug: str, lines: list[str]) -> list[dict]:
+def synthesize(slug: str, lines: list[tuple[str, str]]) -> list[dict]:
     """줄마다 음성을 만들고(캐시), 쉼을 넣어 이어 붙인 뒤 줄별 시간을 돌려준다."""
     CACHE.mkdir(parents=True, exist_ok=True)
     AUDIO.mkdir(parents=True, exist_ok=True)
     parts, cues, t = [], [], 0.0
-    for line in lines:
-        key = hashlib.sha1(f"{VOICE}|{RATE}|{line}".encode()).hexdigest()[:16]
+    for display, speech in lines:
+        key = hashlib.sha1(f"{VOICE}|{RATE}|{speech}".encode()).hexdigest()[:16]
         mp3 = CACHE / f"{key}.mp3"
         if not mp3.exists():
-            asyncio.run(tts(line, mp3))
+            asyncio.run(tts(speech, mp3))
         d = duration_of(mp3)
-        cues.append({"start": round(t, 3), "end": round(t + d, 3), "text": line})
+        cues.append({"start": round(t, 3), "end": round(t + d, 3), "text": display})
         parts.append(mp3)
         t += d + GAP
 
