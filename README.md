@@ -386,3 +386,16 @@
 - 결과
   - `/questions?page=2` → `[290]`~`[281]` 표시, 페이지 버튼 `2` 활성화 (스크린샷)
   - `./gradlew test` 25건 통과
+
+### [023] feat(question): 게시물 번호를 전체 개수 기준 역순으로 표시
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/023)
+- 출처: 교재 3-03
+- 작업
+  - 번호 = `paging.totalElements - (paging.number * paging.size) - loop.index`
+  - 테스트: 25개일 때 1페이지 첫 번호 25, 2페이지 첫 번호 15
+- 이유
+  - [022]까지는 `loop.count`라 모든 페이지가 1~10으로 반복됨
+  - 최신 글이 가장 큰 번호, 가장 오래된 글이 1이 되도록 "전체 개수에서 앞에 지나온 개수만큼 뺀다"
+  - DB의 `id`를 번호로 쓰지 않는 이유: 글이 삭제되면 번호가 듬성듬성 비게 됨
+- 결과
+  - `./gradlew test` 26건 통과

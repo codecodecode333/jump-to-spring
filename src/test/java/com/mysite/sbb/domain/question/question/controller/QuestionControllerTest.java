@@ -126,4 +126,14 @@ class QuestionControllerTest {
                 .contains("sbb가 무엇인가요?", "페이징 03")
                 .doesNotContain("페이징 04");
     }
+
+    @Test
+    @DisplayName("GET /questions: 번호는 전체 개수부터 거꾸로 매겨진다")
+    void listNumbering() {
+        for (int i = 1; i <= 23; i++) questionRepository.save(new Question("페이징 %02d".formatted(i), "내용"));
+        // 총 25개 → 1페이지 첫 번호 25, 2페이지 첫 번호 15
+
+        assertThat(mvc.get().uri("/questions")).bodyText().containsPattern("<td>25</td>\\s*<td>\\s*<a[^>]*>페이징 23");
+        assertThat(mvc.get().uri("/questions?page=2")).bodyText().containsPattern("<td>15</td>\\s*<td>\\s*<a[^>]*>페이징 13");
+    }
 }
