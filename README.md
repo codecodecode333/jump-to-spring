@@ -148,3 +148,27 @@
 - 결과
   - 개발 서버 재시작 시 `insert into question`, `insert into answer` SQL 로그 확인
   - `./gradlew test` 14건 통과 (test 프로필에서는 샘플 데이터 미생성)
+
+### [008] refactor(global): 도메인별 패키지 구조로 정리 (domain / global)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/008)
+- 출처: 교재 2-06, 14163 26강, 14168 패키지 구조
+- 작업
+  ```
+  com.mysite.sbb
+  ├─ domain
+  │  ├─ home/home/controller/MainController
+  │  └─ question
+  │     ├─ question/{entity/Question, repository/QuestionRepository}
+  │     └─ answer/{entity/Answer, repository/AnswerRepository}
+  └─ global
+     ├─ jpa/{entity/BaseEntity, config/JpaConfig}
+     └─ initData/BaseInitData
+  ```
+  - 테스트도 같은 패키지 구조로 이동
+- 이유
+  - 교재는 `question`, `answer`처럼 도메인별로만 나누고 한 폴더에 엔티티·리포지터리·컨트롤러를 섞어 둠
+  - **(개선) `domain/{묶음}/{도메인}/{계층}` (14168)**: 답변은 질문에 딸린 개념이므로 `question` 묶음 아래 `question`, `answer`를 두고, 그 안을 `entity / repository / service / controller` 계층으로 나눔 → 파일이 많아져도 위치를 예측할 수 있음
+  - **(개선) `global`**: 특정 도메인에 속하지 않는 공통 코드(BaseEntity, JPA 설정, 초기 데이터, 나중에 보안·예외 처리)를 분리
+  - 모든 패키지가 메인 클래스(`com.mysite.sbb`) 하위라서 컴포넌트 스캔에는 영향 없음
+- 결과
+  - 동작 변화 없음, `./gradlew test` 14건 통과

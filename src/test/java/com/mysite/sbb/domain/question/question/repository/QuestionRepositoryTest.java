@@ -1,4 +1,9 @@
-package com.mysite.sbb;
+package com.mysite.sbb.domain.question.question.repository;
+
+import com.mysite.sbb.domain.question.answer.entity.Answer;
+import com.mysite.sbb.domain.question.answer.repository.AnswerRepository;
+import com.mysite.sbb.global.jpa.config.JpaConfig;
+import com.mysite.sbb.domain.question.question.entity.Question;
 
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
