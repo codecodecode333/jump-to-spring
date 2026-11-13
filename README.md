@@ -833,3 +833,21 @@
 - 결과
   - 전체 영상 길이 10분 44초 (장 10개 모두 음성 포함)
   - `hyperframes check` 통과, 스냅샷 확인
+
+### [051] feat(video): 배경음악 합성, 전체 렌더링, 유튜브 설명란·챕터 시간표
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/051)
+- 출처: [038]~[050] 설명 영상 장 10개
+- 작업
+  - `scripts/make_bgm.py`: FFmpeg 사인파로 화음 4개(Cmaj7 → Am7 → Fmaj7 → G6)를 겹쳐 반복하는 잔잔한 패드 음 합성 → `audio/bgm.mp3`, 루트에 `data-volume 0.12`(약 −18dB)로 배치
+  - 전체 렌더링: `renders/jump-to-spring-explainer.mp4` (1920×1080, 30fps, H.264 + AAC 스테레오, 10분 44초)
+  - 2-pass `loudnorm`으로 음량을 유튜브 기준 −14 LUFS에 맞춤 (영상 스트림은 그대로 복사)
+  - `YOUTUBE.md`: 제목, 설명란 문구, 챕터 시간표(`build/chapters.txt`와 같은 값), 참고 자료, 사용 도구
+- 이유
+  - 저작권 걱정 없는 배경음악을 위해 직접 합성하고, 스크립트로 남겨 언제든 같은 음악을 다시 만들 수 있게 함
+  - 유튜브는 큰 소리는 줄이지만 작은 소리는 키우지 않으므로, 렌더 원본(−17.0 LUFS)을 −14 LUFS로 맞춤
+  - 챕터 시간표는 손으로 적지 않고 실제 음성 길이로 계산된 값 사용
+- 결과
+  - 최종 음량 −14.0 LUFS, 피크 −1.4 dBFS
+  - 내레이션 구간 약 −13.8 LUFS, 배경음악만 있는 구간 약 −30.5 LUFS (약 17dB 차이)
+  - 장마다 프레임을 뽑아 화면과 자막이 맞는지 확인
+  - 렌더 결과물(MP4)과 음성 파일은 git에 올리지 않음 (`npm run build` → `npm run render`로 다시 생성)
