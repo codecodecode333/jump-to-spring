@@ -535,3 +535,21 @@
 - 결과
   - 브라우저: 상세의 "삭제" 클릭 → 확인 → 목록으로 이동, 해당 질문은 404 (`<meta name="_csrf">` 존재 확인)
   - `./gradlew test` 46건 통과
+
+### [032] feat(answer): 답변 수정·삭제 (PUT·DELETE /questions/{qid}/answers/{id})
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/032)
+- 출처: 교재 3-09, 14168 37~39강
+- 작업
+  - `Answer.isAuthor()`, `Answer.modify()`, `Question.findAnswerById()`, `Question.deleteAnswer()`
+  - `AnswerService.modify()`, `AnswerService.delete()` (질문의 답변 목록에서 제거 → orphanRemoval로 DELETE)
+  - `GET .../answers/{id}/modify`, `PUT .../answers/{id}`, `DELETE .../answers/{id}`, `question/answer/modify.html`
+  - 상세: 답변 글쓴이에게만 수정/삭제 버튼, 답변 수정일시
+  - 테스트: 수정, 삭제, 남의 답변 403
+- 이유
+  - **(개선) 답변을 질문을 통해 찾고 지움 (14168 37강 `findCommentById`, `deleteComment`)**: 질문(애그리거트 루트)이 자기 답변 목록을 관리 → URL의 `questionId`와 실제 답변의 질문이 다르면 찾을 수 없어 404 (다른 질문의 답변을 엉뚱한 URL로 건드릴 수 없음)
+  - **(개선) 삭제는 `answerRepository.delete()` 대신 `answers.remove()`**: [005]의 `orphanRemoval = true` 덕분에 목록에서 빼기만 하면 DELETE. 메모리의 `question.answers`와 DB가 항상 같은 상태로 유지됨
+  - `answers.remove(answer)`가 올바른 답변을 찾는 근거: [005]에서 보완한 `BaseEntity.equals`(id 비교)
+  - 질문과 같은 규칙(PUT/DELETE, 글쓴이만, 403)으로 일관성 유지
+  - 테스트에서만 `flush()`가 필요한 이유: 테스트 전체가 하나의 트랜잭션이라 커밋 전까지 DELETE가 실행되지 않음 (실제 요청은 서비스 트랜잭션이 끝날 때 실행)
+- 결과
+  - `./gradlew test` 49건 통과

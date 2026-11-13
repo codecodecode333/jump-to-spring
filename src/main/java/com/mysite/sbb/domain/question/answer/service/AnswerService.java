@@ -21,4 +21,14 @@ public class AnswerService {
         Question question = questionService.getQuestion(questionId); // 같은 트랜잭션 안에서 조회 → 영속 상태
         return question.addAnswer(content, author);
     }
+
+    @Transactional
+    public void modify(Answer answer, String content) {
+        answer.modify(content);
+    }
+
+    @Transactional
+    public void delete(Answer answer) {
+        answer.getQuestion().deleteAnswer(answer);
+    }
 }

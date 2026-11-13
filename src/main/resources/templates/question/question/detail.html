@@ -46,6 +46,17 @@
                     <div class="mb-2"><span th:text="${answer.author?.username}"></span></div>
                     <div th:text="${#temporals.format(answer.createDate, 'yyyy-MM-dd HH:mm')}"></div>
                 </div>
+                <div class="badge bg-light text-dark p-2 text-start ms-2"
+                     th:if="${!answer.modifyDate.equals(answer.createDate)}">
+                    <div class="mb-2">modified at</div>
+                    <div th:text="${#temporals.format(answer.modifyDate, 'yyyy-MM-dd HH:mm')}"></div>
+                </div>
+            </div>
+            <div class="my-3" th:if="${answer.author != null and #authentication.name == answer.author.username}">
+                <a th:href="@{|/questions/${question.id}/answers/${answer.id}/modify|}"
+                   class="btn btn-sm btn-outline-secondary">수정</a>
+                <a th:href="@{|/questions/${question.id}/answers/${answer.id}|}" method="delete"
+                   data-confirm="정말로 삭제하시겠습니까?" class="btn btn-sm btn-outline-danger">삭제</a>
             </div>
         </div>
     </div>

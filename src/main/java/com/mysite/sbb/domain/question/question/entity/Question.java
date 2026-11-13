@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static jakarta.persistence.CascadeType.PERSIST;
 import static jakarta.persistence.CascadeType.REMOVE;
@@ -60,5 +61,16 @@ public class Question extends BaseEntity {
         Answer answer = new Answer(this, content, author);
         answers.add(answer);
         return answer;
+    }
+
+    // 답변은 질문(애그리거트 루트)을 통해 찾고 지운다 (14168 Post.findCommentById / deleteComment)
+    public Optional<Answer> findAnswerById(Long answerId) {
+        return answers.stream()
+                .filter(answer -> answer.getId().equals(answerId))
+                .findFirst();
+    }
+
+    public void deleteAnswer(Answer answer) {
+        answers.remove(answer); // orphanRemoval = true → 트랜잭션 종료 시 DELETE
     }
 }

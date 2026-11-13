@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>답변 수정</title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <h5 class="my-3 border-bottom pb-2">답변수정</h5>
+    <form th:action="@{|/questions/${answer.question.id}/answers/${answer.id}|}" th:method="put" th:object="${form}">
+        <div th:replace="~{form_errors :: formErrorsFragment}"></div>
+        <div class="mb-3">
+            <label for="content" class="form-label">내용</label>
+            <textarea th:field="*{content}" class="form-control" rows="10"></textarea>
+        </div>
+        <input type="submit" value="수정하기" class="btn btn-primary my-2">
+        <a th:href="@{|/questions/${answer.question.id}|}" class="btn btn-secondary my-2">취소</a>
+    </form>
+</div>
+</body>
+</html>

@@ -34,4 +34,12 @@ public class Answer extends BaseEntity {
         this.content = content;
         this.author = author;
     }
+
+    public boolean isAuthor(SiteUser user) {
+        return author != null && author.equals(user);
+    }
+
+    public void modify(String content) {
+        this.content = content;
+    }
 }

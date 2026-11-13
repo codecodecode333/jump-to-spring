@@ -1,5 +1,6 @@
 package com.mysite.sbb.domain.question.answer.controller;
 
+import com.mysite.sbb.domain.question.answer.entity.Answer;
 import com.mysite.sbb.domain.question.answer.repository.AnswerRepository;
 import com.mysite.sbb.domain.question.question.entity.Question;
 import com.mysite.sbb.domain.question.question.repository.QuestionRepository;
@@ -100,5 +101,57 @@ class AnswerControllerTest {
                 .redirectedUrl().endsWith("/users/login");
 
         assertThat(answerRepository.count()).isZero();
+    }
+
+    private Answer saveAnswer(String username) {
+        Answer answer = question.addAnswer("원래 답변", userService.getUser(username));
+        questionRepository.flush(); // INSERT 해서 id 를 받는다
+        return answer;
+    }
+
+    @Test
+    @DisplayName("PUT /questions/{qid}/answers/{id}: 글쓴이는 답변을 수정할 수 있다")
+    void modify() {
+        Answer answer = saveAnswer("user1");
+
+        assertThat(mvc.get().uri("/questions/{qid}/answers/{id}/modify", question.getId(), answer.getId()))
+                .hasStatusOk();
+        assertThat(mvc.put().uri("/questions/{qid}/answers/{id}", question.getId(), answer.getId())
+                .with(csrf())
+                .param("content", "수정된 답변"))
+                .hasRedirectedUrl("/questions/" + question.getId());
+
+        assertThat(answerRepository.findById(answer.getId()).orElseThrow().getContent()).isEqualTo("수정된 답변");
+    }
+
+    @Test
+    @DisplayName("DELETE /questions/{qid}/answers/{id}: 글쓴이는 답변을 삭제할 수 있다")
+    void deleteAnswer() {
+        Answer answer = saveAnswer("user1");
+
+        assertThat(mvc.delete().uri("/questions/{qid}/answers/{id}", question.getId(), answer.getId())
+                .with(csrf()))
+                .hasRedirectedUrl("/questions/" + question.getId());
+
+        // 테스트는 하나의 트랜잭션 안이라 아직 DELETE 가 실행되지 않았다. flush 로 orphanRemoval 의 DELETE 를 실행시킨다.
+        answerRepository.flush();
+        assertThat(answerRepository.findById(answer.getId())).isEmpty();
+    }
+
+    @Test
+    @DisplayName("다른 사람의 답변은 수정·삭제할 수 없다 (403)")
+    void modifyDeleteForbidden() {
+        userService.create("user2", "user2@test.com", "1234");
+        Answer others = saveAnswer("user2");
+
+        assertThat(mvc.put().uri("/questions/{qid}/answers/{id}", question.getId(), others.getId())
+                .with(csrf())
+                .param("content", "몰래 수정"))
+                .hasStatus(403);
+        assertThat(mvc.delete().uri("/questions/{qid}/answers/{id}", question.getId(), others.getId())
+                .with(csrf()))
+                .hasStatus(403);
+
+        assertThat(answerRepository.findById(others.getId()).orElseThrow().getContent()).isEqualTo("원래 답변");
     }
 }
