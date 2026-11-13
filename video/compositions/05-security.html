@@ -1,22 +1,166 @@
 <!doctype html>
 <html lang="ko">
   <body>
-    <!-- 04 · 보안: 장면은 이 div 안에 작성. id 는 다른 장과 겹치지 않게 ch05- 로 시작 -->
+    <!-- 04 보안: 제목 → 구멍1 GET 상태 변경(교재/위험/개선/CSRF 테스트) → 구멍2 400→403 → 구멍3 마크다운 XSS(실제 변환 결과 비교) -->
     <div id="ch05" class="chapter" data-composition-id="ch05" data-width="1920" data-height="1080">
-      <div class="stage center">
-        <div id="ch05-kicker" class="kicker">04 · 보안</div>
-        <div id="ch05-hero" class="hero">교재 코드의 구멍을 막다</div>
+      <style>
+        #ch05 .layer { position: absolute; inset: 0; padding: 70px 140px 190px; display: flex; flex-direction: column; justify-content: center; opacity: 0; }
+        #ch05 .layer.first { opacity: 1; }
+        #ch05 .hole { font-size: 30px; font-weight: 800; color: var(--muted); margin-bottom: 8px; }
+        #ch05 .steps { display: flex; gap: 14px; margin-bottom: 14px; }
+        #ch05 .steps .step { margin-bottom: 0; opacity: 0.25; }
+        #ch05 .steps .step.on { opacity: 1; }
+        #ch05 .title { font-size: 60px; margin-bottom: 26px; }
+        #ch05 .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px; }
+        #ch05 .label { font-size: 28px; color: var(--muted); margin: 0 0 8px 4px; font-weight: 700; }
+        #ch05 .codebox { font-size: 28px; padding: 22px 28px; }
+        #ch05 .stage2 { position: relative; height: 500px; }
+        #ch05 .pane { position: absolute; inset: 0; opacity: 0; }
+        #ch05 .pane.first { opacity: 1; }
+        #ch05 .warnline { margin-top: 18px; font-size: 32px; font-weight: 700; color: var(--warn); }
+        #ch05 .term { font-size: 28px; margin-top: 20px; }
+        #ch05 .holes { display: flex; gap: 24px; margin-top: 40px; justify-content: center; }
+        #ch05 .holes .card { font-size: 36px; font-weight: 800; padding: 26px 36px; }
+        #ch05 .out { font-family: var(--font-code); font-size: 28px; line-height: 1.55; background: #020617; border: 3px solid var(--line);
+          border-radius: 18px; padding: 22px 26px; white-space: pre; }
+        #ch05 .out.bad { border-color: var(--before); }
+        #ch05 .out.good { border-color: var(--spring); }
+        #ch05 .out .x { color: var(--before); background: rgba(248, 113, 113, 0.15); border-radius: 6px; }
+        #ch05 .out .o { color: var(--spring); background: rgba(109, 179, 63, 0.15); border-radius: 6px; }
+        #ch05 .verdict { font-size: 30px; font-weight: 800; margin-top: 6px; }
+      </style>
+
+      <!-- 0) 제목 -->
+      <div id="ch05-l0" class="layer first center" data-hold>
+        <div class="kicker">04 · 보안</div>
+        <div class="hero">교재 코드의<br /><em>구멍 세 가지</em></div>
+        <div class="holes">
+          <div class="card">① 상태를 바꾸는 GET</div>
+          <div class="card">② 400 → 403</div>
+          <div class="card">③ 마크다운 XSS</div>
+        </div>
       </div>
+
+      <!-- 1) 구멍 1: 상태를 바꾸는 GET -->
+      <div id="ch05-l1" class="layer" data-hold>
+        <div class="hole">구멍 1</div>
+        <div class="steps"><span id="ch05-a1" class="step book on">① 교재 방식</span><span id="ch05-a2" class="step problem">② 문제점</span><span id="ch05-a3" class="step fix">③ 개선 코드</span><span id="ch05-a4" class="step proof">④ 결과 증명</span></div>
+        <div class="title">상태를 바꾸는 GET 요청</div>
+        <div class="stage2">
+          <div id="ch05-1a" class="pane first">
+            <div class="two">
+              <div><div class="label">question_detail.html (교재) — 삭제·추천</div><div class="codebox">&lt;a th:data-uri="@{|/question/delete/…|}"&gt;
+…
+<span class="a">location.href = this.dataset.uri;</span>  <span class="c">// GET</span></div></div>
+              <div><div class="label">SecurityConfig (교재) — 로그아웃</div><div class="codebox">.logoutRequestMatcher(
+  <span class="a">new AntPathRequestMatcher("/user/logout")</span>)
+<span class="c">// 메서드 구분 없음 → GET 도 허용</span></div></div>
+            </div>
+            <div id="ch05-1warn" style="opacity:0">
+              <div class="label" style="margin-top: 24px">다른 사이트에 숨겨 둔 한 줄</div>
+              <div class="codebox"><span class="bad">&lt;img src="https://우리사이트/user/logout"&gt;</span>   <span class="c">// 페이지를 열기만 해도 로그아웃</span></div>
+            </div>
+          </div>
+          <div id="ch05-1b" class="pane">
+            <div class="two">
+              <div><div class="label">컨트롤러 (개선)</div><div class="codebox"><span class="hl">@DeleteMapping</span>("/{id}")          <span class="c">// 삭제</span>
+<span class="hl">@PostMapping</span>("/{id}/votes")     <span class="c">// 추천</span></div></div>
+              <div><div class="label">SecurityConfig (개선)</div><div class="codebox">.logout(logout -&gt; logout
+  .<span class="hl">logoutUrl("/users/logout")</span>)  <span class="c">// POST</span></div></div>
+            </div>
+            <div class="codebox" style="margin-top: 22px">&lt;form <span class="hl">th:action</span>="…"&gt;  →  &lt;input type="hidden" <span class="hl">name="_csrf"</span> value="…"/&gt;  <span class="c">// 자동</span></div>
+            <div id="ch05-1proof" class="term" style="opacity:0"><span class="ok">PASSED</span>  CSRF 토큰 없이 POST 하면 403 (다른 사이트가 사용자 몰래 요청을 보내는 공격 차단)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2) 구멍 2: 400 → 403 -->
+      <div id="ch05-l2" class="layer" data-hold>
+        <div class="hole">구멍 2</div>
+        <div class="steps"><span class="step book on">① 교재 방식</span><span id="ch05-b2" class="step problem">② 문제점</span><span id="ch05-b3" class="step fix">③ 개선 코드</span><span id="ch05-b4" class="step proof">④ 결과 증명</span></div>
+        <div class="title">권한 없음은 400이 아니라 403</div>
+        <div class="two">
+          <div><div class="label">AnswerController (교재)</div><div class="codebox">throw new ResponseStatusException(
+  HttpStatus.<span class="bad">BAD_REQUEST</span>,
+  "수정권한이 없습니다.");</div>
+            <div id="ch05-2warn" class="warnline" style="opacity:0">400 = 요청 형식이 잘못됨</div></div>
+          <div id="ch05-2fix" style="opacity:0"><div class="label">QuestionController (개선)</div><div class="codebox">if (!question.<span class="hl">isAuthor</span>(user))
+  throw new ResponseStatusException(
+    HttpStatus.<span class="hl">FORBIDDEN</span>, "권한이 없습니다.");</div></div>
+        </div>
+        <div id="ch05-2proof" class="term" style="opacity:0"><span class="ok">PASSED</span>  PUT /questions/{id}: 다른 사람의 질문은 수정할 수 없다 (403)
+<span class="ok">PASSED</span>  DELETE /questions/{id}: 다른 사람의 질문은 삭제할 수 없다 (403)
+<span class="ok">PASSED</span>  다른 사람의 답변은 수정·삭제할 수 없다 (403)</div>
+      </div>
+
+      <!-- 3) 구멍 3: 마크다운 XSS (commonmark 0.31.0 으로 같은 입력을 실제 변환한 결과) -->
+      <div id="ch05-l3" class="layer" data-hold>
+        <div class="hole">구멍 3</div>
+        <div class="steps"><span class="step book on">① 교재 방식</span><span id="ch05-c2" class="step problem">② 문제점</span><span id="ch05-c3" class="step fix">③ 개선 코드</span><span id="ch05-c4" class="step proof">④ 결과 증명</span></div>
+        <div class="title">마크다운 XSS</div>
+        <div class="stage2">
+          <div id="ch05-3a" class="pane first">
+            <div class="two">
+              <div><div class="label">CommonUtil (교재)</div><div class="codebox">HtmlRenderer renderer =
+  HtmlRenderer.builder()<span class="bad">.build()</span>;</div>
+                <div id="ch05-3warn" class="warnline" style="opacity:0">본문의 HTML 이 그대로 → 글을 여는 모든 사람의 브라우저에서 실행</div></div>
+              <div id="ch05-3fix" style="opacity:0"><div class="label">MarkdownService (개선)</div><div class="codebox">HtmlRenderer.builder()
+  .<span class="hl">escapeHtml(true)</span>    <span class="c">// HTML → 글자</span>
+  .<span class="hl">sanitizeUrls(true)</span>  <span class="c">// javascript: 제거</span>
+  .build();</div></div>
+            </div>
+          </div>
+          <div id="ch05-3b" class="pane">
+            <div class="label">같은 입력: <span class="code">&lt;script&gt;alert('xss')&lt;/script&gt;</span> · <span class="code">[클릭](javascript:alert(1))</span></div>
+            <div class="two" style="margin-top: 10px; grid-template-columns: 1fr; gap: 16px">
+              <div><div class="out bad">&lt;p&gt;&lt;strong&gt;질문입니다&lt;/strong&gt;&lt;/p&gt;
+<span class="x">&lt;script&gt;alert('xss')&lt;/script&gt;</span>
+&lt;p&gt;&lt;a <span class="x">href="javascript:alert(1)"</span>&gt;클릭&lt;/a&gt;&lt;/p&gt;</div><div class="verdict" style="color: var(--before)">교재 방식: 스크립트 그대로</div></div>
+              <div><div class="out good">&lt;p&gt;&lt;strong&gt;질문입니다&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;<span class="o">&amp;lt;script&amp;gt;</span>alert('xss')<span class="o">&amp;lt;/script&amp;gt;</span>&lt;/p&gt;
+&lt;p&gt;&lt;a rel="nofollow" <span class="o">href=""</span>&gt;클릭&lt;/a&gt;&lt;/p&gt;</div><div class="verdict" style="color: var(--spring)">개선 방식: 글자로 바뀜</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <script>
         (() => {
-          // build.py 가 내레이션 길이에 맞춰 채운다: CUES[i] = i번째 문장이 시작되는 시간(장 기준 초)
-          const CUES = /*CUES*/[]/*END*/;
-          const DUR = /*DUR*/4.0/*END*/;
+          const CUES = /*CUES*/[0.0, 7.598, 12.268, 18.402, 23.576, 30.118, 34.188, 40.154, 48.352, 56.19, 61.1, 66.25, 72.624, 79.502, 84.988, 90.426]/*END*/;
+          const DUR = /*DUR*/102.314/*END*/;
           const at = (i, offset = 0) => (CUES[i] ?? 0) + offset;
-
+          const ease = "power3.out";
           const tl = gsap.timeline({ paused: true });
-          tl.from("#ch05-kicker", { opacity: 0, y: 30, duration: 0.5, ease: "power3.out" }, at(0, 0.1));
-          tl.from("#ch05-hero", { opacity: 0, y: 40, duration: 0.6, ease: "power3.out" }, at(0, 0.3));
+          const show = (sel, t) => tl.to(sel, { opacity: 1, duration: 0.35 }, t);
+          const hide = (sel, t) => tl.to(sel, { opacity: 0, duration: 0.3 }, t);
+          const on = (sel, t) => tl.to(sel, { opacity: 1, duration: 0.3 }, t);
+          const swap = (from, to, t) => { hide(`#ch05-l${from}`, t - 0.1); show(`#ch05-l${to}`, t + 0.15); };
+
+          tl.from("#ch05-l0 .hero", { opacity: 0, y: 40, duration: 0.6, ease }, 0.2);
+          tl.from("#ch05-l0 .holes .card", { opacity: 0, y: 30, duration: 0.45, ease, stagger: 0.6 }, at(0, 2.5));
+
+          // 구멍 1
+          swap(0, 1, at(1));
+          tl.from("#ch05-1a .two > *", { opacity: 0, y: 24, duration: 0.45, ease, stagger: 1.2 }, at(2, 0.2));
+          on("#ch05-a2", at(3)); show("#ch05-1warn", at(3, 0.2));
+          on("#ch05-a3", at(4)); hide("#ch05-1a", at(4)); show("#ch05-1b", at(4, 0.2));
+          on("#ch05-a4", at(6)); show("#ch05-1proof", at(6, 0.2));
+
+          // 구멍 2
+          swap(1, 2, at(7));
+          on("#ch05-b2", at(8)); show("#ch05-2warn", at(8, 0.2));
+          on("#ch05-b3", at(8, 2.4)); show("#ch05-2fix", at(8, 2.6));
+          on("#ch05-b4", at(8, 4.8)); show("#ch05-2proof", at(8, 5.0));
+
+          // 구멍 3
+          swap(2, 3, at(10));
+          tl.from("#ch05-3a .two > :first-child", { opacity: 0, y: 24, duration: 0.45, ease }, at(11));
+          on("#ch05-c2", at(12)); show("#ch05-3warn", at(12, 0.2));
+          on("#ch05-c3", at(13)); show("#ch05-3fix", at(13, 0.2));
+          on("#ch05-c4", at(14)); hide("#ch05-3a", at(14)); show("#ch05-3b", at(14, 0.2));
+          tl.from("#ch05-3b .two > :first-child", { opacity: 0, x: -20, duration: 0.45, ease }, at(14, 0.6));
+          tl.from("#ch05-3b .two > :last-child", { opacity: 0, x: 20, duration: 0.45, ease }, at(15));
+
           window.__timelines = window.__timelines || {};
           window.__timelines["ch05"] = tl;
         })();

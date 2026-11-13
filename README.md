@@ -746,3 +746,21 @@
 - 결과
   - 설정 있음: 1 test, 0 failures / 설정 없음: 실패 (영상용 재실행), `application.yaml`은 변경 없음
   - `hyperframes check` 통과, 스냅샷에서 로그 첫 줄 넘침을 발견해 줄임
+
+### [045] feat(video): 보안 장 (음성 94초, GET 상태 변경·400→403·마크다운 XSS 실제 변환 비교)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/045)
+- 출처: 대본 [039] `05-security.txt`, README [025]·[028]·[030]·[031]·[035], 교재 저장소 `question_detail.html`·`SecurityConfig`·`AnswerController`·`CommonUtil`
+- 작업
+  - 보안 장 내레이션 생성 (16문장, 94초 + 결과 화면 여유 8초)
+  - `compositions/05-security.html`: 구멍마다 ①~④ 배지가 순서대로 켜짐
+    - 구멍 1: 교재 `location.href = this.dataset.uri`(GET 삭제·추천), `AntPathRequestMatcher("/user/logout")` → 숨긴 `<img>` 한 줄의 위험 → `@DeleteMapping`·`@PostMapping`·`logoutUrl`(POST)·`_csrf` 자동 → CSRF 403 테스트 PASSED
+    - 구멍 2: 교재 `BAD_REQUEST` → `isAuthor` + `FORBIDDEN` → 403 테스트 3개 PASSED
+    - 구멍 3: 교재 `HtmlRenderer.builder().build()` → `escapeHtml(true)`·`sanitizeUrls(true)` → 같은 입력의 **실제 변환 결과** 두 개를 위아래로 비교
+  - 증거 만들기: jshell + 프로젝트가 쓰는 commonmark 0.31.0 jar로 같은 입력을 두 설정으로 변환, 컨트롤러 테스트 28개 재실행
+- 이유
+  - XSS는 "실행된다"를 말로 하는 대신, 교재 설정이 `<script>`와 `javascript:` 링크를 그대로 내보내고 개선 설정은 `&lt;script&gt;`, `href=""`로 바꾸는 실제 출력을 보여 줌
+  - 교재 코드 인용은 모두 교재 저장소 원문 (삭제·추천 JS, 로그아웃 설정, 400 응답, `CommonUtil`)
+  - 결과가 긴 출력 두 개를 좌우로 놓으면 박스를 넘쳐서(스냅샷으로 발견), 출력을 자르지 않고 위아래로 배치
+- 결과
+  - 컨트롤러 테스트 재실행: AnswerControllerTest 9개, QuestionControllerTest 19개 모두 통과
+  - `hyperframes check` 통과, 스냅샷 확인
