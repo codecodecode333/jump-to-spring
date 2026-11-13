@@ -11,7 +11,9 @@
     <h2 class="border-bottom py-2" th:text="${question.subject}"></h2>
     <div class="card my-3">
         <div class="card-body">
-            <div class="card-text" style="white-space: pre-line;" th:text="${question.content}"></div>
+            <!-- th:utext: HTML 을 이스케이프하지 않고 출력 (안전성은 MarkdownService 의 escapeHtml 이 담당)
+                 Thymeleaf 3.1 은 th:utext 안에서 빈(@) 호출 같은 표현식을 제한하므로 th:with 로 먼저 계산 -->
+            <div class="card-text" th:with="contentHtml=${@markdownService.render(question.content)}" th:utext="${contentHtml}"></div>
             <div class="d-flex justify-content-end">
                 <div class="badge bg-light text-dark p-2 text-start">
                     <div class="mb-2"><span th:text="${question.author?.username}"></span></div>
@@ -49,7 +51,9 @@
         <!-- 앵커: /questions/2#answer_3 으로 접속하면 이 위치로 스크롤 -->
         <a th:id="|answer_${answer.id}|"></a>
         <div class="card-body">
-            <div class="card-text" style="white-space: pre-line;" th:text="${answer.content}"></div>
+            <!-- th:utext: HTML 을 이스케이프하지 않고 출력 (안전성은 MarkdownService 의 escapeHtml 이 담당)
+                 Thymeleaf 3.1 은 th:utext 안에서 빈(@) 호출 같은 표현식을 제한하므로 th:with 로 먼저 계산 -->
+            <div class="card-text" th:with="contentHtml=${@markdownService.render(answer.content)}" th:utext="${contentHtml}"></div>
             <div class="d-flex justify-content-end">
                 <div class="badge bg-light text-dark p-2 text-start">
                     <div class="mb-2"><span th:text="${answer.author?.username}"></span></div>

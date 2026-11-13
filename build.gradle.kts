@@ -26,6 +26,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
+	implementation("org.commonmark:commonmark:0.31.0") // 마크다운 → HTML (스프링 부트가 버전을 관리하지 않으므로 직접 지정)
 	implementation("org.springframework.boot:spring-boot-h2console")
 	runtimeOnly("com.h2database:h2")
 	compileOnly("org.projectlombok:lombok")

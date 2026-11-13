@@ -586,3 +586,21 @@
   - **(개선) 리다이렉트 URL 생성을 한 메서드로**: 교재는 컨트롤러 메서드마다 `String.format("redirect:/question/detail/%s#answer_%s", ...)`를 반복
 - 결과
   - `./gradlew test` 51건 통과
+
+### [035] feat(global): 질문·답변 본문 마크다운 적용 (XSS 방지)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/035)
+- 출처: 교재 3-12
+- 작업
+  - `org.commonmark:commonmark:0.31.0` 의존성
+  - `global/markdown/MarkdownService.render()`: `HtmlRenderer`에 `escapeHtml(true)`, `sanitizeUrls(true)`
+  - 상세 화면: `th:with="contentHtml=${@markdownService.render(...)}" th:utext="${contentHtml}"`
+  - 테스트: `MarkdownServiceTest` 3건(변환, `<script>` 이스케이프, `javascript:` 링크 무력화) + 상세 화면 통합 테스트
+- 이유
+  - 질문/답변에 코드 블록, 목록, 강조 등을 쓸 수 있게
+  - **(개선) XSS 방지**: 교재의 `CommonUtil`은 기본 설정이라 본문에 `<script>`를 쓰면 `th:utext`로 그대로 출력되어, 그 글을 보는 모든 사람의 브라우저에서 스크립트가 실행됨(저장형 XSS). 사용자가 직접 쓴 HTML은 글자로 바꾸고 위험한 URL은 제거
+  - **(개선) `Parser`/`HtmlRenderer`를 필드로 한 번만 생성**: 교재는 호출할 때마다 새로 만듦. 상태가 없는(thread-safe) 객체라 재사용 가능
+  - 이름을 `CommonUtil` 대신 `MarkdownService`로: 무엇을 하는지 이름으로 드러남
+  - Thymeleaf 3.1은 `th:utext` 안의 표현식을 제한된 모드로 평가해서 빈 호출(`@markdownService`)이 막힘 → `th:with`로 먼저 계산 (테스트로 발견)
+  - 0.32.0은 공개된 지 2주 남짓이라 검증된 0.31.0 사용
+- 결과
+  - `./gradlew test` 55건 통과

@@ -239,4 +239,16 @@ class QuestionControllerTest {
 
         assertThat(questionRepository.findById(q1.getId()).orElseThrow().getVoters()).hasSize(1);
     }
+
+    @Test
+    @DisplayName("상세 화면은 본문 마크다운을 HTML 로 보여주고, 직접 쓴 <script> 는 실행되지 않게 출력한다")
+    void detailMarkdown() {
+        Question q = questionRepository.save(new Question("마크다운", "**굵게**\n\n<script>alert(1)</script>", null));
+
+        assertThat(mvc.get().uri("/questions/{id}", q.getId()))
+                .hasStatusOk()
+                .bodyText()
+                .contains("<strong>굵게</strong>", "&lt;script&gt;")
+                .doesNotContain("<script>alert(1)</script>");
+    }
 }
