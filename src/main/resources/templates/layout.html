@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 각 페이지의 <title> 이 $CONTENT_TITLE, 여기 적힌 값이 $LAYOUT_TITLE -->
+    <title layout:title-pattern="$CONTENT_TITLE | $LAYOUT_TITLE">SBB</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/js/bootstrap.bundle.min.js" defer></script>
+    <!-- Pretendard -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+    <!-- 사이트 공통 -->
+    <link rel="stylesheet" th:href="@{/resource/style.css}">
+</head>
+<body>
+<!-- 각 페이지의 layout:fragment="content" 가 이 자리에 들어간다 -->
+<th:block layout:fragment="content"></th:block>
+</body>
+</html>

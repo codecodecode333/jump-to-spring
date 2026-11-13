@@ -286,3 +286,20 @@
 - 결과
   - 목록/상세 화면에 부트스트랩 스타일 적용 확인 (스크린샷)
   - `./gradlew test` 19건 통과
+
+### [017] refactor(global): 표준 HTML 구조와 공통 레이아웃 (layout.html)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/017)
+- 출처: 교재 2-15, 14168 44~45강
+- 작업
+  - `thymeleaf-layout-dialect` 의존성, `templates/layout.html` (`<!DOCTYPE>`, `lang`, `meta charset/viewport`, CSS/JS 링크)
+  - 각 페이지는 `layout:decorate="~{layout}"` + `layout:fragment="content"`만 작성
+  - `layout:title-pattern="$CONTENT_TITLE | $LAYOUT_TITLE"`로 페이지별 제목 (`질문 목록 | SBB`, `질문 제목 | SBB`)
+  - Bootstrap JS 번들도 레이아웃에서 한 번 로드 (다음 단계 내비게이션 바에서 사용)
+- 이유
+  - 각 페이지에 `<head>`, CSS 링크가 반복되던 것을 한 곳으로 → CSS를 바꿀 때 레이아웃 한 파일만 수정
+  - `<html>`, `<head>`, `<body>`를 갖춘 표준 HTML이어야 브라우저가 문서를 정확히 해석함 (교재 2-15)
+  - **(개선) `title-pattern` (14168 45강)**: 교재는 모든 페이지 제목이 같음. 브라우저 탭/즐겨찾기에서 페이지를 구분할 수 있게
+  - **(개선) `xmlns:th`, `xmlns:layout` 선언 (14168 44강)**: IDE의 `Namespace 'layout' is not bound` 경고 제거
+- 결과
+  - `/questions` → `<title>질문 목록 | SBB</title>`, `/questions/2` → `<title>스프링부트 모델 질문입니다. | SBB</title>`
+  - `./gradlew test` 19건 통과
