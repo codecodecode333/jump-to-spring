@@ -189,3 +189,15 @@
 - 결과
   - 브라우저 `/questions`에서 샘플 질문 2건의 제목·작성일시 표시
   - `./gradlew test` 15건 통과
+
+### [010] feat(home): 루트 URL을 질문 목록으로 리다이렉트
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/010)
+- 출처: 교재 2-08, 14163 33강
+- 작업
+  - `GET /` → `redirect:/questions`, `MainControllerTest`를 리다이렉트 검증으로 수정
+- 이유
+  - 사이트 첫 화면에 들어오면 바로 질문 목록을 보여 주기 위해
+  - `redirect:`는 서버가 **302 + Location 헤더**를 보내고 브라우저가 그 주소로 다시 요청함 → 주소창도 `/questions`로 바뀜 (`forward:`는 서버 안에서만 넘겨서 주소창이 그대로)
+- 결과
+  - `GET /` → 302, `Location: /questions`
+  - `./gradlew test` 15건 통과

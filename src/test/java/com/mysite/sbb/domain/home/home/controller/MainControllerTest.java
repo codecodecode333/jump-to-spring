@@ -15,11 +15,11 @@ class MainControllerTest {
     private MockMvcTester mvc;
 
     @Test
-    @DisplayName("GET / 는 200과 함께 SBB 를 응답한다")
+    @DisplayName("GET / 는 질문 목록(/questions)으로 리다이렉트한다")
     void index() {
         assertThat(mvc.get().uri("/"))
-                .hasStatusOk()
-                .hasBodyTextEqualTo("SBB");
+                .hasStatus3xxRedirection()
+                .hasRedirectedUrl("/questions");
     }
 
     @Test
