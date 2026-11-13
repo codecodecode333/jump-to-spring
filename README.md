@@ -448,3 +448,18 @@
   - **(개선) `existsByUsername/Email`**: 다음 단계에서 가입 전에 중복을 미리 검사해 사용자에게 필드별 오류로 알려주기 위해 (DB 유니크 제약은 최종 안전장치로 유지)
 - 결과
   - `./gradlew test` 30건 통과
+
+### [027] feat(user): 회원가입 화면과 검증 (비밀번호 확인, 아이디·이메일 중복)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/027)
+- 출처: 교재 3-06, 14168 9~25강
+- 작업
+  - `UserController`: `GET/POST /users/signup`, `SignupForm` record(`@NotBlank`, `@Size`, `@Email`)
+  - 비밀번호 확인 불일치, 아이디·이메일 중복은 `bindingResult.rejectValue()`로 해당 필드 오류 등록
+  - `user/user/signup.html`, 내비게이션 바에 "회원가입" 링크
+  - `UserControllerTest` 4건: 폼, 가입 성공, 비밀번호 불일치, 중복
+- 이유
+  - 어노테이션으로 표현할 수 없는 규칙(두 필드 비교, DB 조회가 필요한 중복)은 컨트롤러에서 검사하고 같은 오류 목록에 합쳐 보여줌
+  - **(개선) 중복을 저장 전에 검사**: 교재는 저장을 시도한 뒤 `DataIntegrityViolationException`을 잡아 "이미 등록된 사용자입니다" 하나로 처리 → 아이디와 이메일 중 무엇이 중복인지 알 수 없음. 미리 `exists`로 확인해 항목별로 알려줌 (DB 유니크 제약은 동시 가입 같은 경우의 최종 안전장치로 유지)
+  - **(개선) URL `/users/signup`**: 다른 자원과 같이 복수형 프리픽스, 폼은 record (14168 40강)
+- 결과
+  - `./gradlew test` 34건 통과
