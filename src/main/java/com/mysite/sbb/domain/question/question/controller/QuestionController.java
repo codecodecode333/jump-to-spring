@@ -149,4 +149,13 @@ public class QuestionController {
         questionService.delete(question);
         return "redirect:/questions";
     }
+
+    // 교재: GET /question/vote/{id} → 개선: POST /questions/{id}/votes (추천 = 투표 자원을 하나 생성)
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{id}/votes")
+    public String vote(@PathVariable Long id, Principal principal) {
+        Question question = questionService.getQuestion(id);
+        questionService.vote(question, userService.getUser(principal.getName()));
+        return "redirect:/questions/" + id;
+    }
 }

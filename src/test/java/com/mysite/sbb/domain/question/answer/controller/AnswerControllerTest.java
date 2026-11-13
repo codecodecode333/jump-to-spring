@@ -154,4 +154,16 @@ class AnswerControllerTest {
 
         assertThat(answerRepository.findById(others.getId()).orElseThrow().getContent()).isEqualTo("원래 답변");
     }
+
+    @Test
+    @DisplayName("POST /questions/{qid}/answers/{id}/votes: 답변 추천")
+    void vote() {
+        Answer answer = saveAnswer("user1");
+
+        assertThat(mvc.post().uri("/questions/{qid}/answers/{id}/votes", question.getId(), answer.getId())
+                .with(csrf()))
+                .hasRedirectedUrl("/questions/" + question.getId());
+
+        assertThat(answerRepository.findById(answer.getId()).orElseThrow().getVoters()).hasSize(1);
+    }
 }

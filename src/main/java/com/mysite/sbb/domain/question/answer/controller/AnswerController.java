@@ -113,4 +113,17 @@ public class AnswerController {
         answerService.delete(answer);
         return "redirect:/questions/" + questionId;
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{id}/votes")
+    public String vote(
+            @PathVariable Long questionId,
+            @PathVariable Long id,
+            Principal principal
+    ) {
+        Answer answer = questionService.getQuestion(questionId).findAnswerById(id)
+                .orElseThrow(() -> new DataNotFoundException("answer not found: " + id));
+        answerService.vote(answer, userService.getUser(principal.getName()));
+        return "redirect:/questions/" + questionId;
+    }
 }

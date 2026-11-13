@@ -553,3 +553,21 @@
   - 테스트에서만 `flush()`가 필요한 이유: 테스트 전체가 하나의 트랜잭션이라 커밋 전까지 DELETE가 실행되지 않음 (실제 요청은 서비스 트랜잭션이 끝날 때 실행)
 - 결과
   - `./gradlew test` 49건 통과
+
+### [033] feat(question): 질문·답변 추천 (POST .../votes)
+- [링크](https://github.com/codecodecode333/jump-to-spring/commit/033)
+- 출처: 교재 3-10
+- 작업
+  - `Question.voters`, `Answer.voters`: `@ManyToMany Set<SiteUser>` + `vote(user)`
+  - `POST /questions/{id}/votes`, `POST /questions/{qid}/answers/{id}/votes` (로그인 필요)
+  - 상세: 질문·답변마다 "추천 N" 버튼 (`a[method=post]` + 확인창)
+  - 테스트: 추천 수 증가, 같은 사람이 두 번 추천해도 1
+- 이유
+  - 한 회원이 여러 글을, 한 글을 여러 회원이 추천하므로 다대다 → JPA가 중간 테이블(`question_voters`, `answer_voters`)을 만들어 줌
+  - `Set`을 써서 중복 추천을 자동으로 막음 (`BaseEntity.equals/hashCode` 기준으로 같은 회원 판별)
+  - **(개선) 추천을 GET이 아닌 POST로**: 교재는 `GET /question/vote/{id}` 링크 + JS `location.href`. 데이터를 바꾸는 요청이므로 [031]의 `global.js`를 재사용해 POST + CSRF로 전송 (`method="post"` 속성 하나만 추가)
+  - **(개선) URL `/votes`**: "추천 하나를 생성한다"로 보고 자원(votes) + POST
+  - 추천 수 표시는 LAZY 컬렉션이지만 [024]의 batch fetch 설정으로 답변들의 추천자도 묶어서 조회
+- 결과
+  - 브라우저: 2번 질문 추천 → "추천 1" 표시
+  - `./gradlew test` 51건 통과

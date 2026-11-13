@@ -31,4 +31,9 @@ public class AnswerService {
     public void delete(Answer answer) {
         answer.getQuestion().deleteAnswer(answer);
     }
+
+    @Transactional
+    public void vote(Answer answer, SiteUser user) {
+        answer.vote(user);
+    }
 }

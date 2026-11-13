@@ -228,4 +228,15 @@ class QuestionControllerTest {
                 .hasStatus(403);
         assertThat(questionRepository.findById(others.getId())).isPresent();
     }
+
+    @Test
+    @DisplayName("POST /questions/{id}/votes: 추천하면 추천 수가 늘고, 같은 사람이 다시 추천해도 1번만 센다")
+    void vote() {
+        assertThat(mvc.post().uri("/questions/{id}/votes", q1.getId()).with(csrf()))
+                .hasRedirectedUrl("/questions/" + q1.getId());
+        assertThat(mvc.post().uri("/questions/{id}/votes", q1.getId()).with(csrf()))
+                .hasRedirectedUrl("/questions/" + q1.getId());
+
+        assertThat(questionRepository.findById(q1.getId()).orElseThrow().getVoters()).hasSize(1);
+    }
 }

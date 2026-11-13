@@ -53,4 +53,9 @@ public class QuestionService {
     public void delete(Question question) {
         questionRepository.delete(question); // cascade REMOVE 로 답변도 함께 삭제
     }
+
+    @Transactional
+    public void vote(Question question, SiteUser user) {
+        question.vote(user);
+    }
 }

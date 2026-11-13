@@ -24,6 +24,13 @@
                     <div th:text="${#temporals.format(question.modifyDate, 'yyyy-MM-dd HH:mm')}"></div>
                 </div>
             </div>
+            <div class="my-3">
+                <!-- POST 요청이므로 a[method] + global.js (CSRF 토큰 포함) -->
+                <a th:href="@{|/questions/${question.id}/votes|}" method="post"
+                   data-confirm="정말로 추천하시겠습니까?" class="btn btn-sm btn-outline-secondary">
+                    추천 <span class="badge rounded-pill bg-success" th:text="${#sets.size(question.voters)}"></span>
+                </a>
+            </div>
             <!-- 글쓴이에게만 수정 버튼 -->
             <div class="my-3" th:if="${question.author != null and #authentication.name == question.author.username}">
                 <a th:href="@{|/questions/${question.id}/modify|}" class="btn btn-sm btn-outline-secondary">수정</a>
@@ -51,6 +58,12 @@
                     <div class="mb-2">modified at</div>
                     <div th:text="${#temporals.format(answer.modifyDate, 'yyyy-MM-dd HH:mm')}"></div>
                 </div>
+            </div>
+            <div class="my-3">
+                <a th:href="@{|/questions/${question.id}/answers/${answer.id}/votes|}" method="post"
+                   data-confirm="정말로 추천하시겠습니까?" class="btn btn-sm btn-outline-secondary">
+                    추천 <span class="badge rounded-pill bg-success" th:text="${#sets.size(answer.voters)}"></span>
+                </a>
             </div>
             <div class="my-3" th:if="${answer.author != null and #authentication.name == answer.author.username}">
                 <a th:href="@{|/questions/${question.id}/answers/${answer.id}/modify|}"

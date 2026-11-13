@@ -6,9 +6,13 @@ import com.mysite.sbb.domain.question.question.entity.Question;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static jakarta.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
@@ -29,6 +33,12 @@ public class Answer extends BaseEntity {
     @ManyToOne(fetch = LAZY)
     private SiteUser author;
 
+    // 추천한 회원들. 한 회원이 여러 글을, 한 글을 여러 회원이 추천 → 다대다(ManyToMany)
+    // Set: 같은 회원이 두 번 추천해도 한 번만 들어간다 (BaseEntity.equals/hashCode 기준)
+    // 중간 테이블(answer_voters)이 자동으로 생긴다
+    @ManyToMany
+    private final Set<SiteUser> voters = new HashSet<>();
+
     public Answer(Question question, String content, SiteUser author) {
         this.question = question;
         this.content = content;
@@ -41,5 +51,9 @@ public class Answer extends BaseEntity {
 
     public void modify(String content) {
         this.content = content;
+    }
+
+    public void vote(SiteUser user) {
+        voters.add(user);
     }
 }

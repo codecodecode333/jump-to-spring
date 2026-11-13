@@ -6,14 +6,17 @@ import com.mysite.sbb.global.jpa.entity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static jakarta.persistence.CascadeType.PERSIST;
 import static jakarta.persistence.CascadeType.REMOVE;
@@ -33,6 +36,12 @@ public class Question extends BaseEntity {
     // 글쓴이. 여러 질문(Many)을 한 회원(One)이 쓸 수 있다. (기존 데이터 때문에 NULL 허용)
     @ManyToOne(fetch = LAZY)
     private SiteUser author;
+
+    // 추천한 회원들. 한 회원이 여러 글을, 한 글을 여러 회원이 추천 → 다대다(ManyToMany)
+    // Set: 같은 회원이 두 번 추천해도 한 번만 들어간다 (BaseEntity.equals/hashCode 기준)
+    // 중간 테이블(question_voters)이 자동으로 생긴다
+    @ManyToMany
+    private final Set<SiteUser> voters = new HashSet<>();
 
     // mappedBy: 외래키(question_id)는 Answer 쪽이 가진다. 이 필드는 DB 칼럼이 생기지 않는다.
     // PERSIST: 질문을 저장하면 새로 추가된 답변도 함께 저장, REMOVE: 질문을 지우면 답변도 함께 삭제
@@ -72,5 +81,9 @@ public class Question extends BaseEntity {
 
     public void deleteAnswer(Answer answer) {
         answers.remove(answer); // orphanRemoval = true → 트랜잭션 종료 시 DELETE
+    }
+
+    public void vote(SiteUser user) {
+        voters.add(user);
     }
 }
